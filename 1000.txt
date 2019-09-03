@@ -1,0 +1,914 @@
+;-------------------------------------------------------------------------------
+; Copyright (C) 1999-2001 TYPE-MOON All right reserved.
+;
+;       TYPE-MOON Start Script File for NScripter Ver.1.92 or upper
+;
+;   title   : 月姫 お祭りディスク フロー : タイトル・ギャラリー・オプション
+;	file	: 1000.txt
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
+;	スクリプトブロック開始
+;-------------------------------------------------------------------------------
+;ゲームスタート ----------------------------------------------------------------
+*start
+
+;スクリプトエンジンのバージョンチェック
+; Ver.1.92以上にのみ対応
+getversion %version
+if %version>=192 jumpf
+Ｎｓｃｒｉｐｔｅｒのバージョンが古いです。
+新しいものを取得してください。
+end
+~
+
+;基本セーブファイルを読み込む
+if %noload==0 loadgame 21
+inc %noload
+
+*loaded
+
+!sd
+
+;	カーソルを表示しない
+setcursor 0,":l/3,160,2;icon\hollow.bmp",0,0
+setcursor 1,":l/3,160,2;icon\hollow.bmp",0,0
+
+;ウィンドウ設定
+gosub *set_window
+gosub *restore_weffect
+
+;一番最初の起動なら、各種の設定を行う
+if %execution_cnt>0 skip 7
+gosub *normal_effectspeed
+mov %effectskip,0
+mov %sceneskip,0
+mov %wordskip,0
+mov %4020,1
+
+;フラグオンチェック
+if %ren_point>=5 mov %guest_image9,1
+if %gojitsudan_point>=2 mov %yume02,1
+if %fin_yume01>0 && %fin_yume02>0 && %fin_yume03>0 && %fin_yume04>0 && %fin_yume05>0 && %fin_yume06>0 && %fin_yume07>0 && %fin_yume08>0 && %fin_yume09>0 && %fin_yume10>0 && %finish_ep>0 mov %finish_yume,1
+if %yume01>0 mov %yume_on,1
+if %yume02>0 mov %yume_on,1
+if %yume03>0 mov %yume_on,1
+if %yume04>0 mov %yume_on,1
+if %yume05>0 mov %yume_on,1
+if %yume06>0 mov %yume_on,1
+if %yume07>0 mov %yume_on,1
+if %yume08>0 mov %yume_on,1
+if %yume09>0 mov %yume_on,1
+if %yume10>0 mov %yume_on,1
+
+;カンパニーロゴ ----------------------------------------------------------------
+;	TYPE-MOON
+bg "image\word\type_moon.jpg",%type_crossfade_mid
+
+resettimer
+waittimer 1000
+
+;	真っ黒
+bg #000000,%type_crossfade_mid
+
+;今日の一言 --------------------------------------------------------------------
+if %execution_cnt>0 jumpf
+setwindow 101,90, 19,9, 26,26, -3,4, 22, 1, 1,#ffffff, 0,0, 639,479
+bg "image\msg\tu.jpg",%type_crossfade_fst
+　このたびは、「歌月十夜_」をご購入いただきありがとうございます。
+br
+　「歌月十夜_」は何度も繰り返し遊んで頂くことにより、選択肢を増やして行き結末へ辿りつくゲームです。\
+
+　最初は攻略にこだわらず、様々な選択肢を試してみてください。
+　ゲームの進行具合により、ＣＧやショートストーリーなどが見れるようにもなります。
+br
+　月姫本編より難易度が高めですので、ゲームが得意でない方は右上にあるヘルプを利用してください。\
+
+一日の最後で、
+　　「ｒｅｐｅａｔ　ａｇａｉｎ_」
+が表示されますと自動的に状態が保存されます。
+「ゲームを始める_」を選んでプレイを続けてください。\
+
+基本的にセーブ・ロードは使いませんが、途中で終了しなければならなくなったときにのみ使用してください。\
+
+bg black,%type_crossfade_fst
+
+br
+br
+br
+br
+　　それでは、お祭りのはじまりです。\
+
+skip 33
+
+~
+if %wordskip==1 skip 31
+mov $msgline0,""
+mov $msgline1,""
+mov $msgline2,""
+mov $msgline3,""
+mov $msgline4,""
+mov $msgline5,""
+mov $msgline6,""
+mov $msgline7,""
+mov $msgline8,""
+;ウィンドウ設定
+setwindow 101,90, 19,9, 26,26, -3,4, 22, 1, 1,#ffffff, 0,0, 639,479
+;メッセージ、背景、前景の選択
+gosub *select_message
+lsp 0,$msgfg,0,0
+bg $msgbg,%type_crossfade_mid
+$msgline0
+$msgline1
+$msgline2
+$msgline3
+$msgline4
+$msgline5
+$msgline6
+$msgline7
+$msgline8
+\
+
+;ウィンドウ設定を戻す
+gosub *set_window
+csp -1
+
+;起動回数を加算
+inc %execution_cnt
+
+;タイトル画面 ------------------------------------------------------------------
+*title
+
+;	カーソルを表示する
+setcursor 0,":l/3,160,2;icon\cursor0.bmp",0,0
+setcursor 1,":l/3,160,2;icon\cursor1.bmp",0,0
+
+*title_loop
+
+bg "image\title\kagetsu_title01.jpg",%type_crossfade_mid
+
+btndef "image\title\kagetsu_title02.jpg"
+btn 1,12,405,150,34,12,405
+btn 2,178,405,150,34,178,405
+btn 3,342,405,119,34,342,405
+btn 4,474,405,150,34,474,405
+
+btnwait %buttonno
+
+if %buttonno==0 skip -2
+if %buttonno==-1 skip -3
+
+;ゲーム開始(最初から)
+if %buttonno==1 goto *gamestart_menu
+;途中から
+if %buttonno==2 playstop:bg "image\gamestart\load.jpg",%type_crossfade_mid:systemcall load
+;オプション(ギャラリー・設定)
+if %buttonno==3 gosub *option:mov %buttonno,0
+;終了
+if %buttonno==4 playstop:bg #000000,%type_crossfade_fst:end
+
+;戻る
+goto *title_loop
+
+;-------------------------------------------------------------------------------
+;ゲーム開始メニュー(画像は"image\gamestart"に)
+*gamestart_menu
+
+;背景用意
+if %yume_on>0 lsp 0,":c;image\gamestart\gsel_yume.jpg",0,180
+if %finish_yume>0 lsp 1,":c;image\gamestart\gsel_summer.jpg",0,113
+;lsp 0,":c;image\gamestart\gsel_yume.jpg",0,180
+;lsp 1,":c;image\gamestart\gsel_summer.jpg",0,113
+bg "image\gamestart\game_selct04.jpg",%type_crossfade_mid
+
+;ボタン定義
+btndef "image\gamestart\game_selct02.jpg"
+btn 1,0,51,386,58,0,51
+if %yume_on>0 btn 3,0,180,386,58,0,180
+if %finish_yume>0 btn 2,0,113,386,58,0,113
+;btn 2,0,113,386,58,0,113
+;btn 3,0,180,386,58,0,180
+btn 4,281,436,74,39,281,436
+
+;入力待ち
+btnwait %buttonno
+
+if %buttonno==0 skip -2
+csp -1
+if %buttonno==-1 goto *title_loop
+
+;各項目へ
+if %buttonno==1 goto *twilight
+if %buttonno==2 goto *summer
+if %buttonno==3 goto *yume
+
+;「戻る」なら戻る
+if %buttonno==4 goto *title_loop
+
+goto *gamestart_menu
+
+;-------------------------------------------------------------------------------
+;Twilight Grass Moon, Fairy Tale Princess
+*twilight
+
+;背景
+if %flg8>0 lsp 2,":c;image\gamestart\twilight\twilight_op.jpg",484,228
+if %twilight_aday>0 lsp 0,":c;image\gamestart\twilight\twilight_aday.jpg",484,287
+if %twilight_ep>0 lsp 1,":c;image\gamestart\twilight\twilight_ep.jpg",484,348
+;lsp 0,":c;image\gamestart\twilight\twilight_aday.jpg",484,287
+;lsp 1,":c;image\gamestart\twilight\twilight_ep.jpg",484,348
+bg "image\gamestart\twilight\twilight03.jpg",%type_crossfade_mid
+
+;ボタン定義
+if %flg8>0 btndef "image\gamestart\twilight\twilight04.jpg":skip 2
+btndef "image\gamestart\twilight\twilight02.jpg"
+
+btn 1,484,228,89,49,484,228
+if %twilight_aday>0 btn 2,484,287,89,49,484,287
+if %twilight_ep>0 btn 3,484,348,89,49,484,348
+;btn 2,484,287,89,49,484,287
+;btn 3,484,348,89,49,484,348
+btn 4,589,5,51,28,589,5
+btn 5,284,436,68,40,284,436
+
+;入力待ち
+btnwait %buttonno
+
+if %buttonno==0 skip -2
+
+;削除
+csp -1
+
+if %buttonno==-1 goto *gamestart_menu
+
+;各項目へ
+if %buttonno==1 goto *twilight_op
+if %buttonno==2 goto *f500
+if %buttonno==3 goto *twilight_ep
+if %buttonno==4 goto *ciel_teacher
+
+;「戻る」なら戻る
+if %buttonno==5 goto *gamestart_menu
+
+goto *twilight
+
+;-------------------------------------------------------------------------------
+;夏祭り
+*summer
+
+bg "image\gamestart\summer\summer01.jpg",%type_crossfade_mid
+
+;ボタン定義
+btndef "image\gamestart\summer\summer02.jpg"
+btn 1,387,220,126,36,387,220
+btn 2,387,260,126,36,387,260
+btn 3,387,300,126,36,387,300
+btn 4,387,340,126,36,387,340
+btn 5,387,380,126,36,387,380
+btn 6,286,436,65,39,286,436
+
+;入力待ち
+btnwait %buttonno
+
+if %buttonno==0 skip -2
+if %buttonno==-1 goto *gamestart_menu
+
+;各項目へ
+if %buttonno==1 goto *summer_ark
+if %buttonno==2 goto *summer_ciel
+if %buttonno==3 goto *summer_akiha
+if %buttonno==4 goto *summer_hisui
+if %buttonno==5 goto *summer_kohaku
+
+;「戻る」なら戻る
+if %buttonno==6 goto *gamestart_menu
+
+goto *summer
+
+;-------------------------------------------------------------------------------
+;夢十夜
+*yume
+
+;選択肢スプライト
+if %yume01>0 lsp 0,":c;image\gamestart\yume\yume01btn.jpg",386,29
+if %yume02>0 lsp 1,":c;image\gamestart\yume\yume02btn.jpg",386,69
+if %yume03>0 lsp 2,":c;image\gamestart\yume\yume03btn.jpg",386,109
+if %yume04>0 lsp 3,":c;image\gamestart\yume\yume04btn.jpg",386,149
+if %yume05>0 lsp 4,":c;image\gamestart\yume\yume05btn.jpg",386,189
+if %yume06>0 lsp 5,":c;image\gamestart\yume\yume06btn.jpg",386,229
+if %yume07>0 lsp 6,":c;image\gamestart\yume\yume07btn.jpg",386,269
+if %yume08>0 lsp 7,":c;image\gamestart\yume\yume08btn.jpg",386,309
+if %yume09>0 lsp 8,":c;image\gamestart\yume\yume09btn.jpg",386,349
+if %yume10>0 lsp 9,":c;image\gamestart\yume\yume10btn.jpg",386,389
+;lsp 0,":c;image\gamestart\yume\yume01btn.jpg",386,29
+;lsp 1,":c;image\gamestart\yume\yume02btn.jpg",386,69
+;lsp 2,":c;image\gamestart\yume\yume03btn.jpg",386,109
+;lsp 3,":c;image\gamestart\yume\yume04btn.jpg",386,149
+;lsp 4,":c;image\gamestart\yume\yume05btn.jpg",386,189
+;lsp 5,":c;image\gamestart\yume\yume06btn.jpg",386,229
+;lsp 6,":c;image\gamestart\yume\yume07btn.jpg",386,269
+;lsp 7,":c;image\gamestart\yume\yume08btn.jpg",386,309
+;lsp 8,":c;image\gamestart\yume\yume09btn.jpg",386,349
+;lsp 9,":c;image\gamestart\yume\yume10btn.jpg",386,389
+
+;背景
+bg "image\gamestart\yume\yume03.jpg",%type_crossfade_mid
+
+;ボタン定義
+btndef "image\gamestart\yume\yume02.jpg"
+if %yume01>0 btn 1,386,29,254,35,386,29
+if %yume02>0 btn 2,386,69,254,35,386,69
+if %yume03>0 btn 3,386,109,254,35,386,109
+if %yume04>0 btn 4,386,149,254,35,386,149
+if %yume05>0 btn 5,386,189,254,35,386,189
+if %yume06>0 btn 6,386,229,254,35,386,229
+if %yume07>0 btn 7,386,269,254,35,386,269
+if %yume08>0 btn 8,386,309,254,35,386,309
+if %yume09>0 btn 9,386,349,254,35,386,349
+if %yume10>0 btn 10,386,389,254,35,386,389
+;btn 1,386,29,254,35,386,29
+;btn 2,386,69,254,35,386,69
+;btn 3,386,109,254,35,386,109
+;btn 4,386,149,254,35,386,149
+;btn 5,386,189,254,35,386,189
+;btn 6,386,229,254,35,386,229
+;btn 7,386,269,254,35,386,269
+;btn 8,386,309,254,35,386,309
+;btn 9,386,349,254,35,386,349
+;btn 10,386,389,254,35,386,389
+btn 11,285,438,63,38,285,438
+
+;入力待ち
+btnwait %buttonno
+
+if %buttonno==0 skip -2
+csp -1
+if %buttonno==-1 goto *gamestart_menu
+
+;各項目へ
+if %buttonno==1 goto *yume01
+if %buttonno==2 goto *yume02
+if %buttonno==3 goto *yume03
+if %buttonno==4 goto *yume04
+if %buttonno==5 goto *yume05
+if %buttonno==6 goto *yume06
+if %buttonno==7 goto *yume07
+if %buttonno==8 goto *yume08
+if %buttonno==9 goto *yume09
+if %buttonno==10 goto *yume10
+
+;「戻る」なら戻る
+if %buttonno==11 goto *gamestart_menu
+
+goto *yume
+
+;-------------------------------------------------------------------------------
+;オプションメニュー(画像は"image\option"に)
+*option
+bg "image\option\option01.jpg",%type_crossfade_mid
+
+btndef "image\option\option02.jpg"
+btn 1,0,181,386,44,0,181
+btn 2,251,231,389,46,251,231
+btn 3,280,440,74,34,280,440
+
+;入力待ち
+btnwait %buttonno
+
+if %buttonno==0 skip -2
+if %buttonno==-1 return
+
+;各項目へ
+if %buttonno==1 gosub *gallery:mov %buttonno,0
+if %buttonno==2 gosub *gameopt:mov %buttonno,0
+
+;「戻る」なら戻る
+if %buttonno==3 return
+
+goto *option
+
+;-------------------------------------------------------------------------------
+;ゲーム設定(画像は"image\gameopt"に)
+*gameopt
+
+;ON/OFFを表示する
+if %effectskip==1 lsp 30,":c;image\gameopt\effectok.jpg",534,152
+if %sceneskip==1 lsp 31,":c;image\gameopt\sceneok.jpg",534,212
+if %wordskip==0 lsp 32,":c;image\gameopt\dailymsgok.jpg",534,272
+bg "image\gameopt\config02.jpg",%type_crossfade_mid
+skip 9
+
+*gameopt_loop
+;ON/OFFを表示する
+if %effectskip==1 lsp 30,":c;image\gameopt\effectok.jpg",534,152
+if %sceneskip==1 lsp 31,":c;image\gameopt\sceneok.jpg",534,212
+if %wordskip==0 lsp 32,":c;image\gameopt\dailymsgok.jpg",534,272
+bg "image\gameopt\config02.jpg",%type_nowaitdisp
+
+btndef "image\gameopt\config01.jpg"
+btn 1,81,145,450,51,81,145
+btn 2,81,206,450,51,81,206
+btn 3,81,266,450,51,81,266
+btn 4,276,435,80,41,276,435
+
+;入力待ち
+btnwait %buttonno
+
+if %buttonno==0 skip -2
+
+;ONを消去しておく
+csp -1
+
+if %buttonno==-1 return
+
+;フラグの切り替え
+if %buttonno!=1 skip 3
+if %effectskip!=1 mov %effectskip,1:skip 2
+if %effectskip==1 mov %effectskip,0
+
+if %buttonno!=2 skip 3
+if %sceneskip!=1 mov %sceneskip,1:skip 2
+if %sceneskip==1 mov %sceneskip,0
+
+if %buttonno!=3 skip 3
+if %wordskip!=1 mov %wordskip,1:skip 2
+if %wordskip==1 mov %wordskip,0
+
+;エフェクト速度を設定する
+if %effectskip==1 gosub *velocity_effectspeed
+if %effectskip==0 gosub *normal_effectspeed
+
+;「戻る」なら戻る
+if %buttonno==4 return
+
+goto *gameopt_loop
+
+;-------------------------------------------------------------------------------
+;ギャラリーメニュー
+*gallery
+bg "image\gallery\gallery_select01.jpg",%type_crossfade_mid
+
+btndef "image\gallery\gallery_select02.jpg"
+btn 1,72,56,200,150,72,56
+btn 2,368,56,200,150,368,56
+btn 3,72,264,200,150,72,264
+btn 4,368,264,200,150,368,264
+btn 5,284,439,64,35,284,439
+
+;入力待ち
+btnwait %buttonno
+
+if %buttonno==0 skip -2
+if %buttonno==-1 return
+
+;各項目へ
+if %buttonno==1 gosub *ren_event_gallery:mov %buttonno,0
+if %buttonno==2 gosub *yume_event_gallery:mov %buttonno,0
+if %buttonno==3 gosub *post_gallery:mov %buttonno,0
+if %buttonno==4 gosub *guest_gallery:mov %buttonno,0
+
+;「戻る」なら戻る
+if %buttonno==5 return
+
+goto *gallery
+
+;-------------------------------------------------------------------------------
+;レンイベントギャラリー
+*ren_event_gallery_check
+
+;「戻る」を選択していれば、選択のページへ戻る
+if %4012==0 return
+
+;ページ移動
+add %4020,%4012
+
+;「ギャラリーメニュー」から来るところ
+*ren_event_gallery
+
+;ページ番号を整える(1〜3)
+if %4020>3 mov %4020,1
+if %4020<1 mov %4020,3
+
+;閲覧するイメージを選ぶ
+;1ページ
+notif %4020==1 skip 13
+mov $4000,"image\gallery\ren\ren1.jpg"
+mov $4010,"image\gallery\ren\ren1btn.jpg"
+mov $4001,"image\event\ren_e01.jpg"
+mov $4002,"image\event\ren_e02a.jpg"
+mov $4003,"image\event\ren_e02b.jpg"
+mov $4004,"image\event\ren_e03.jpg"
+mov $4005,"image\event\ren_e04.jpg"
+mov $4006,"image\event\ren_e05.jpg"
+mov $4007,"image\event\ren_e06.jpg"
+mov $4008,"image\event\ren_e07.jpg"
+mov $4009,"image\event\ren_e08.jpg"
+
+;2ページ
+notif %4020==2 skip 13
+mov $4000,"image\gallery\ren\ren2.jpg"
+mov $4010,"image\gallery\ren\ren2btn.jpg"
+mov $4001,"image\event\ren_e09.jpg"
+mov $4002,"image\event\ren_e10.jpg"
+mov $4003,""
+mov $4004,""
+mov $4005,""
+mov $4006,""
+mov $4007,""
+mov $4008,""
+mov $4009,""
+
+;3ページ
+notif %4020==3 skip 13
+mov $4000,"image\gallery\ren\ren3.jpg"
+mov $4010,"image\gallery\ren\ren3btn.jpg"
+mov $4001,"image\event\ren_h01.jpg"
+mov $4002,"image\event\ren_h04.jpg"
+mov $4003,"image\event\ren_h02.jpg"
+mov $4004,"image\event\ren_h03.jpg"
+mov $4005,"image\event\ren_h05.jpg"
+mov $4006,"image\event\ren_h06.jpg"
+mov $4007,"image\event\ren_h07.jpg"
+mov $4008,"image\event\ren_h08.jpg"
+mov $4009,"image\event\ren_h09.jpg"
+
+;ページ番号を更新
+mov %4025,%4020
+
+;イメージ閲覧ルーチンへ移動
+gosub *imagemode
+
+;繰り返し
+goto *ren_event_gallery_check
+
+return
+
+;-------------------------------------------------------------------------------
+;夢十夜イベントギャラリー
+*yume_event_gallery_check
+
+;「戻る」を選択していれば、選択のページへ戻る
+if %4012==0 return
+
+;ページ移動
+add %4020,%4012
+
+;「ギャラリーメニュー」から来るところ
+*yume_event_gallery
+
+;ページ番号を整える(1〜4)
+if %4020>4 mov %4020,1
+if %4020<1 mov %4020,4
+
+;閲覧するイメージを選ぶ
+;1ページ
+notif %4020==1 skip 13
+mov $4000,"image\gallery\yume\yume1.jpg"
+mov $4010,"image\gallery\yume\yume1btn.jpg"
+mov $4001,"image\event\yume_e01.jpg"
+mov $4002,"image\event\yume_e02.jpg"
+mov $4003,"image\event\yume_e03.jpg"
+mov $4004,"image\event\yume_e04.jpg"
+mov $4005,"image\event\yume_e05.jpg"
+mov $4006,"image\event\yume_e06a.jpg"
+mov $4007,"image\event\yume_e07a.jpg"
+mov $4008,"image\event\yume_e07b.jpg"
+mov $4009,"image\event\yume_e07c.jpg"
+
+;2ページ
+notif %4020==2 skip 13
+mov $4000,"image\gallery\yume\yume2.jpg"
+mov $4010,"image\gallery\yume\yume2btn.jpg"
+mov $4001,"image\event\yume_e08.jpg"
+mov $4002,"image\event\yume_e09a.jpg"
+mov $4003,"image\event\yume_e09b.jpg"
+mov $4004,"image\event\yume_e09c.jpg"
+mov $4005,"image\event\yume_e10.jpg"
+mov $4006,"image\event\yume_e11a.jpg"
+mov $4007,"image\event\yume_e12b.jpg"
+mov $4008,"image\event\yume_e13.jpg"
+mov $4009,"image\event\yume_e14.jpg"
+
+;3ページ
+notif %4020==3 skip 13
+mov $4000,"image\gallery\yume\yume3.jpg"
+mov $4010,"image\gallery\yume\yume3btn.jpg"
+mov $4001,"image\event\yume_e15a.jpg"
+mov $4002,"image\event\yume_e15b.jpg"
+mov $4003,"image\event\yume_e15e.jpg"
+mov $4004,"image\event\yume_e16.jpg"
+mov $4005,"image\event\yume_e17.jpg"
+mov $4006,"image\event\yume_e18a.jpg"
+mov $4007,"image\event\yume_e18b.jpg"
+mov $4008,"image\event\yume_e19.jpg"
+mov $4009,"image\event\yume_e20.jpg"
+
+;4ページ
+notif %4020==4 skip 13
+mov $4000,"image\gallery\yume\yume4.jpg"
+mov $4010,"image\gallery\yume\yume4btn.jpg"
+mov $4001,"image\event\yume_h01.jpg"
+mov $4002,"image\event\yume_h02.jpg"
+mov $4003,"image\event\yume_h03.jpg"
+mov $4004,"image\event\yume_h04.jpg"
+mov $4005,"image\event\yume_h05.jpg"
+mov $4006,"image\event\yume_h06.jpg"
+mov $4007,"image\event\yume_h07.jpg"
+mov $4008,"image\event\yume_h08.jpg"
+mov $4009,"image\event\yume_h09.jpg"
+
+;ページ番号を更新
+mov %4025,%4020
+
+;イメージ閲覧ルーチンへ移動
+gosub *imagemode
+
+;繰り返し
+goto *yume_event_gallery_check
+
+return
+
+;-------------------------------------------------------------------------------
+;ゲストギャラリー
+*guest_gallery_check
+
+;「戻る」を選択していれば、選択のページへ戻る
+if %4012==0 return
+
+;ページ移動
+add %4020,%4012
+
+;「ギャラリーメニュー」から来るところ
+*guest_gallery
+
+;ページ番号を整える(1〜2)
+if %4020>2 mov %4020,1
+if %4020<1 mov %4020,2
+
+;閲覧するイメージを選ぶ
+;1ページ
+notif %4020==1 skip 22
+mov $4000,"image\gallery\guest\guest1.jpg"
+mov $4010,"image\gallery\guest\guest1btn.jpg"
+mov $4001,"image\guest\gcg_01.jpg":mov $4041,"テイクアウト_？":mov $4051,"こやまひろかず"
+mov $4002,"image\guest\gcg_02.jpg":mov $4042,"しあわせ帝国の逆襲":mov $4052,"こやまひろかず"
+mov $4003,"image\guest\gcg_03.jpg":mov $4043,"ななこ１２０％":mov $4053,"ＢＬＡＣＫ"
+mov $4004,"image\guest\gcg_04.jpg":mov $4044,"幸せ遠野家計画":mov $4054,"ＢＬＡＣＫ"
+mov $4005,"image\guest\gcg_05.jpg":mov $4045,"青":mov $4055,"都市夫"
+mov $4006,"image\guest\gcg_06.jpg":mov $4046,"月の柩":mov $4056,"桐原小鳥"
+mov $4007,"image\guest\gcg_07.jpg":mov $4047,"月牢":mov $4057,"結城辰也"
+mov $4008,"image\guest\gcg_08.jpg":mov $4048,"獣博士":mov $4058,"小鳥遊丸"
+mov $4009,"image\guest\gcg_09.jpg":mov $4049,"キャラクター選択画面（希望）":mov $4059,"小鳥遊丸"
+mov %4041,%guest_image1
+mov %4042,%guest_image2
+mov %4043,%guest_image3
+if %guest_image4_1>0 && %guest_image4_2>0 mov %4044,1:skip 2
+mov %4044,0
+mov %4045,%guest_image5
+mov %4046,%guest_image6
+mov %4047,%guest_image7
+mov %4048,%guest_image8
+mov %4049,%guest_image9
+
+;2ページ
+notif %4020==2 skip 22
+mov $4000,"image\gallery\guest\guest2.jpg"
+mov $4010,"image\gallery\guest\guest2btn.jpg"
+mov $4001,"image\guest\gcg_10.jpg":mov $4041,"ヒーロー":mov $4051,"小鳥遊丸"
+mov $4002,"image\guest\gcg_11.jpg":mov $4042,"ななこ解体診書":mov $4052,"小鳥遊丸／しのづかあつと"
+mov $4003,"image\guest\gcg_12.jpg":mov $4043,"なつまつりのよるに":mov $4053,"しのづかあつと"
+mov $4004,"image\guest\gcg_13.jpg":mov $4044,"赭":mov $4054,"しのづかあつと"
+mov $4005,"image\guest\gcg_14.jpg":mov $4045,"妄想と煩悩の果て":mov $4055,"しのづかあつと"
+mov $4006,""
+mov $4007,""
+mov $4008,""
+mov $4009,""
+mov %4041,%guest_image10
+mov %4042,%guest_image11
+mov %4043,%guest_image12
+mov %4044,%guest_image13
+mov %4045,%guest_image14
+mov %4046,0
+mov %4047,0
+mov %4048,0
+mov %4049,0
+
+;ページ番号を更新
+mov %4025,%4020
+
+;イメージ閲覧ルーチンへ移動
+gosub *imagemode_guest
+
+;繰り返し
+goto *guest_gallery_check
+
+return
+
+;-------------------------------------------------------------------------------
+;投稿ギャラリー
+*post_gallery_check
+
+;「戻る」を選択していれば、ヒロイン選択のページへ戻る
+if %4012==0 return
+
+;ページ移動
+add %4020,%4012
+
+;「ギャラリーメニュー」から来るところ
+*post_gallery
+
+;夏祭りを見終わっていれば、酔夢月が見れる
+mov %msgno,32767
+if %finish_summer>0 mov %msgno,1
+
+;ページ番号を整える(1〜12)
+if %4020>12 mov %4020,1
+if %4020<1 mov %4020,12
+
+;閲覧するイメージを選ぶ
+;1ページ
+notif %4020==1 skip 13
+mov $4000,"image\gallery\post\post1.jpg"
+mov $4010,"image\gallery\post\post1btn.jpg"
+mov $4001,"image\post\tcg_001.jpg":mov %4061,1:mov $4041,"ヴァンパイアはんたーシエル":mov $4051,"ａｌｐｈｅｓ"
+mov $4002,"image\post\tcg_002.jpg":mov %4062,1:mov $4042,"お姫さまの優雅な午後":mov $4052,"Ｂａ"
+mov $4003,"image\post\tcg_003.jpg":mov %4063,1:mov $4043,"ひすこは浴衣乱舞":mov $4053,"ＢｅＢｅ"
+mov $4004,"image\post\tcg_004.jpg":mov %4064,1:mov $4044,"ＢｌｏｏｄｙＥｙｅｓ":mov $4054,"ｅｇｇｙ"
+mov $4005,"image\post\tcg_005.jpg":mov %4065,1:mov $4045,"探しています":mov $4055,"Ｋｅｒｄｉｎａｌ"
+mov $4006,"image\post\tcg_006.jpg":mov %4066,1:mov $4046,"Ｉｎｖｉｔａｔｉｏｎ":mov $4056,"Ｋｏｕｍａ"
+mov $4007,"image\post\tcg_007.jpg":mov %4067,1:mov $4047,"大きな木の下で":mov $4057,"ＭｙＫｅ"
+mov $4008,"image\post\tcg_008.jpg":mov %4068,1:mov $4048,"藍より出でしモノ":mov $4058,"ｏｎｅｚｅｒｏ"
+mov $4009,"image\post\tcg_009.jpg":mov %4069,1:mov $4049,"アルクＦＡＣＥ":mov $4059,"ｏｎｅｚｅｒｏ"
+
+;2ページ
+notif %4020==2 skip 13
+mov $4000,"image\gallery\post\post2.jpg"
+mov $4010,"image\gallery\post\post2btn.jpg"
+mov $4001,"image\post\tcg_010.jpg":mov %4061,3:mov $4041,"紅の月":mov $4051,"ｏｎｅｚｅｒｏ"
+mov $4002,"image\post\tcg_011.jpg":mov %4062,3:mov $4042,"志貴さん強引ですねー":mov $4052,"ＱｕＡ"
+mov $4003,"image\post\tcg_012.jpg":mov %4063,3:mov $4043,"どっちが綺麗_？":mov $4053,"Ｒａ・グナス"
+mov $4004,"image\post\tcg_013.jpg":mov %4064,3:mov $4044,"蒼月の代行者":mov $4054,"Ｓ．Ｍ"
+mov $4005,"image\post\tcg_014.jpg":mov %4065,3:mov $4045,"月見":mov $4055,"Ｓ．Ｍ"
+mov $4006,"image\post\tcg_015.jpg":mov %4066,3:mov $4046,"夜ヲ駆ケルモノ":mov $4056,"Ｓ．Ｍ"
+mov $4007,"image\post\tcg_016.jpg":mov %4067,3:mov $4047,"アルクェイド":mov $4057,"ｓａｓａｉ"
+mov $4008,"image\post\tcg_017.jpg":mov %4068,3:mov $4048,"暴走するアルクェイド":mov $4058,"ＳＥＴＯ１４"
+mov $4009,"image\post\tcg_018.jpg":mov %4069,3:mov $4049,"狂蔦月":mov $4059,"ＳＥＴＯ１４"
+
+;3ページ
+notif %4020==3 skip 13
+mov $4000,"image\gallery\post\post3.jpg"
+mov $4010,"image\gallery\post\post3btn.jpg"
+mov $4001,"image\post\tcg_019.jpg":mov %4061,5:mov $4041,"ｔｈｅ　７ｔｈ　ｓｃｒｉｐｔｕｒｅｓ〜第７聖典〜":mov $4051,"ＳＨＩＢＡ−Ｏ"
+mov $4002,"image\post\tcg_020.jpg":mov %4062,5:mov $4042,"琥珀さんと夏祭り":mov $4052,"Ｓｉｇ"
+mov $4003,"image\post\tcg_021.jpg":mov %4063,5:mov $4043,"秋葉と夏祭り":mov $4053,"Ｓｉｇ"
+mov $4004,"image\post\tcg_022.jpg":mov %4064,5:mov $4044,"大切な人":mov $4054,"ＴＡＺＺ"
+mov $4005,"image\post\tcg_023.jpg":mov %4065,5:mov $4045,"赤髪の童女":mov $4055,"あうんのいき"
+mov $4006,"image\post\tcg_024.jpg":mov %4066,5:mov $4046,"妹さんの詮索":mov $4056,"あうんのいき"
+mov $4007,"image\post\tcg_025.jpg":mov %4067,5:mov $4047,"翡翠さんの叱咤":mov $4057,"あうんのいき"
+mov $4008,"image\post\tcg_026.jpg":mov %4068,5:mov $4048,"月姫蒼香":mov $4058,"あうんのいき"
+mov $4009,"image\post\tcg_027.jpg":mov %4069,5:mov $4049,"第七聖典〜精霊Ｖｅｒ．〜":mov $4059,"あうんのいき"
+
+;4ページ
+notif %4020==4 skip 13
+mov $4000,"image\gallery\post\post4.jpg"
+mov $4010,"image\gallery\post\post4btn.jpg"
+mov $4001,"image\post\tcg_028.jpg":mov %4061,7:mov $4041,"空の弓":mov $4051,"あうんのいき"
+mov $4002,"image\post\tcg_029.jpg":mov %4062,7:mov $4042,"夏だ_！月見だ_！宴会だ_！":mov $4052,"エッジ９９"
+mov $4003,"image\post\tcg_030.jpg":mov %4063,7:mov $4043,"夏_！":mov $4053,"かすよし"
+mov $4004,"image\post\tcg_031.jpg":mov %4064,7:mov $4044,"Ｗｉｓｈ":mov $4054,"かづいつつ"
+mov $4005,"image\post\tcg_032.jpg":mov %4065,7:mov $4045,"クレーンゲームの景品化希望♪":mov $4055,"かむかむ"
+mov $4006,"image\post\tcg_033.jpg":mov %4066,7:mov $4046,"つながってるんです":mov $4056,"ぐるる"
+mov $4007,"image\post\tcg_034.jpg":mov %4067,7:mov $4047,"ｂａｄ　ｃｏｍｍｕｎｉｃａｔｉｏｎ":mov $4057,"くろねこまいける"
+mov $4008,"image\post\tcg_035.jpg":mov %4068,7:mov $4048,"Ｓｈａ　Ｔｈｅ　Ｍｏｏｎ":mov $4058,"けにひ"
+mov $4009,"image\post\tcg_036.jpg":mov %4069,7:mov $4049,"眼鏡をかけていない先輩なんて先輩じゃない":mov $4059,"こうき くう"
+
+;5ページ
+notif %4020==5 skip 13
+mov $4000,"image\gallery\post\post5.jpg"
+mov $4010,"image\gallery\post\post5btn.jpg"
+mov $4001,"image\post\tcg_037.jpg":mov %4061,9:mov $4041,"耳姫":mov $4051,"ごん"
+mov $4002,"image\post\tcg_038.jpg":mov %4062,9:mov $4042,"十字架なんか怖くない":mov $4052,"こんぺいとう"
+mov $4003,"image\post\tcg_039.jpg":mov %4063,9:mov $4043,"翡翠の月":mov $4053,"ささきひろゆき"
+mov $4004,"image\post\tcg_040.jpg":mov %4064,9:mov $4044,"混沌の者":mov $4054,"じぇいべるつ"
+mov $4005,"image\post\tcg_041.jpg":mov %4065,9:mov $4045,"双子は萌えるれろ〜":mov $4055,"すず"
+mov $4006,"image\post\tcg_042.jpg":mov %4066,9:mov $4046,"猫姫":mov $4056,"スペけん"
+mov $4007,"image\post\tcg_043.jpg":mov %4067,9:mov $4047,"おいしいパンを召し上がれ":mov $4057,"たぢまよしかづ"
+mov $4008,"image\post\tcg_044.jpg":mov %4068,9:mov $4048,"宴の支度":mov $4058,"とりしも"
+mov $4009,"image\post\tcg_045.jpg":mov %4069,9:mov $4049,"月と先輩":mov $4059,"ト吉"
+
+;6ページ
+notif %4020==6 skip 13
+mov $4000,"image\gallery\post\post6.jpg"
+mov $4010,"image\gallery\post\post6btn.jpg"
+mov $4001,"image\post\tcg_046.jpg":mov %4061,11:mov $4041,"月とアル":mov $4051,"ト吉"
+mov $4002,"image\post\tcg_047.jpg":mov %4062,11:mov $4042,"ＲＯＣＫ　ＴＨＥ　ＦＵＴＵＲＥ_！":mov $4052,"はやし道士"
+mov $4003,"image\post\tcg_048.jpg":mov %4063,11:mov $4043,"向月葵＠和服ならなんでも似合いそう":mov $4053,"フォルセティ"
+mov $4004,"image\post\tcg_049.jpg":mov %4064,11:mov $4044,"月提灯＠祭りの時でもメイド服":mov $4054,"フォルセティ"
+mov $4005,"image\post\tcg_050.jpg":mov %4065,11:mov $4045,"或る朝＠ファンディスクということでファンサービスをするアルク":mov $4055,"フォルセティ"
+mov $4006,"image\post\tcg_051.jpg":mov %4066,11:mov $4046,"日常":mov $4056,"ふらふら"
+mov $4007,"image\post\tcg_052.jpg":mov %4067,11:mov $4047,"残念賞":mov $4057,"ゆーき"
+mov $4008,"image\post\tcg_053.jpg":mov %4068,11:mov $4048,"仲良くお花見":mov $4058,"ユキダ ウチ"
+mov $4009,"image\post\tcg_054.jpg":mov %4069,11:mov $4049,"死都に降り立つアルクェイド":mov $4059,"らいあ"
+
+;7ページ
+notif %4020==7 skip 13
+mov $4000,"image\gallery\post\post7.jpg"
+mov $4010,"image\gallery\post\post7btn.jpg"
+mov $4001,"image\post\tcg_055.jpg":mov %4061,13:mov $4041,"夏のお約束":mov $4051,"わたりべ尚文"
+mov $4002,"image\post\tcg_056.jpg":mov %4062,13:mov $4042,"琥珀サンと翡翠チャンのはず（汗）":mov $4052,"彩瀬さくら"
+mov $4003,"image\post\tcg_057.jpg":mov %4063,13:mov $4043,"花火":mov $4053,"永歩けい"
+mov $4004,"image\post\tcg_058.jpg":mov %4064,13:mov $4044,"地下室のメロディ":mov $4054,"加藤４０２"
+mov $4005,"image\post\tcg_059.jpg":mov %4065,13:mov $4045,"その後の月姫インドネシア編":mov $4055,"果心堂"
+mov $4006,"image\post\tcg_060.jpg":mov %4066,13:mov $4046,"夏の笑顔":mov $4056,"開夢"
+mov $4007,"image\post\tcg_061.jpg":mov %4067,13:mov $4047,"桃源郷":mov $4057,"寒村"
+mov $4008,"image\post\tcg_062.jpg":mov %4068,13:mov $4048,"こはくのきせつ・四季":mov $4058,"郡雨"
+mov $4009,"image\post\tcg_063.jpg":mov %4069,13:mov $4049,"第七聖典":mov $4059,"御影洋綺"
+
+;8ページ
+notif %4020==8 skip 13
+mov $4000,"image\gallery\post\post8.jpg"
+mov $4010,"image\gallery\post\post8btn.jpg"
+mov $4001,"image\post\tcg_064.jpg":mov %4061,15:mov $4041,"それが…約束だったから":mov $4051,"侯爵"
+mov $4002,"image\post\tcg_065.jpg":mov %4062,15:mov $4042,"月夜の花嫁たち":mov $4052,"侯爵"
+mov $4003,"image\post\tcg_066.jpg":mov %4063,15:mov $4043,"紅音色":mov $4053,"甲斐"
+mov $4004,"image\post\tcg_067.jpg":mov %4064,15:mov $4044,"お嬢様と召使い":mov $4054,"紅赤朱"
+mov $4005,"image\post\tcg_068.jpg":mov %4065,15:mov $4045,"空想具現化":mov $4055,"高阪はじめ"
+mov $4006,"image\post\tcg_069.jpg":mov %4066,15:mov $4046,"月下の姫":mov $4056,"高阪はじめ"
+mov $4007,"image\post\tcg_070.jpg":mov %4067,15:mov $4047,"気高きモノ":mov $4057,"高阪はじめ"
+mov $4008,"image\post\tcg_071.jpg":mov %4068,15:mov $4048,"鬼姫":mov $4058,"左　藤兵衛"
+mov $4009,"image\post\tcg_072.jpg":mov %4069,15:mov $4049,"洛葉":mov $4059,"座間"
+
+;9ページ
+notif %4020==9 skip 13
+mov $4000,"image\gallery\post\post9.jpg"
+mov $4010,"image\gallery\post\post9btn.jpg"
+mov $4001,"image\post\tcg_073.jpg":mov %4061,17:mov $4041,"月":mov $4051,"冴坂あく"
+mov $4002,"image\post\tcg_074.jpg":mov %4062,17:mov $4042,"夜店にシキ":mov $4052,"紙魚"
+mov $4003,"image\post\tcg_075.jpg":mov %4063,17:mov $4043,"吸血衝動":mov $4053,"七号"
+mov $4004,"image\post\tcg_076.jpg":mov %4064,17:mov $4044,"秋と紅の葉":mov $4054,"七号"
+mov $4005,"image\post\tcg_077.jpg":mov %4065,17:mov $4045,"遠野秋葉":mov $4055,"七号"
+mov $4006,"image\post\tcg_078.jpg":mov %4066,17:mov $4046,"アルクェイド・ブリュンスタッド":mov $4056,"七号"
+mov $4007,"image\post\tcg_079.jpg":mov %4067,17:mov $4047,"着せ替え大会_！":mov $4057,"若月俊一郎"
+mov $4008,"image\post\tcg_080.jpg":mov %4068,17:mov $4048,"朝の攻防":mov $4058,"樹響也"
+mov $4009,"image\post\tcg_081.jpg":mov %4069,17:mov $4049,"ディバイデッド":mov $4059,"秋葉裕司"
+
+;10ページ
+notif %4020==10 skip 13
+mov $4000,"image\gallery\post\post10.jpg"
+mov $4010,"image\gallery\post\post10btn.jpg"
+mov $4001,"image\post\tcg_082.jpg":mov %4061,19:mov $4041,"月姫史上最大の戦闘（嘘）":mov $4051,"松山直樹"
+mov $4002,"image\post\tcg_083.jpg":mov %4062,19:mov $4042,"Ａ　ｒａｙ　ｏｆ　ｍｏｏｎｌｉｇｈｔ":mov $4052,"水馬"
+mov $4003,"image\post\tcg_084.jpg":mov %4063,19:mov $4043,"秋":mov $4053,"青木誠也"
+mov $4004,"image\post\tcg_085.jpg":mov %4064,19:mov $4044,"でゅえっと♪":mov $4054,"丹"
+mov $4005,"image\post\tcg_086.jpg":mov %4065,19:mov $4045,"隣に…":mov $4055,"蝶子"
+mov $4006,"image\post\tcg_087.jpg":mov %4066,19:mov $4046,"ｐｒｉｎｃｅｓｓ":mov $4056,"長谷川イワシ"
+mov $4007,"image\post\tcg_088.jpg":mov %4067,19:mov $4047,"…さぁ、兄さんっ♪":mov $4057,"八重しらぎ"
+mov $4008,"image\post\tcg_089.jpg":mov %4068,19:mov $4048,"明け刻の憂鬱":mov $4058,"八重しらぎ"
+mov $4009,"image\post\tcg_090.jpg":mov %4069,19:mov $4049,"真夏夜の憂鬱":mov $4059,"八重しらぎ"
+
+;11ページ
+notif %4020==11 skip 13
+mov $4000,"image\gallery\post\post11.jpg"
+mov $4010,"image\gallery\post\post11btn.jpg"
+mov $4001,"image\post\tcg_091.jpg":mov %4061,21:mov $4041,"華とハミ":mov $4051,"八頭司夏樹"
+mov $4002,"image\post\tcg_092.jpg":mov %4062,21:mov $4042,"カレー味わたあめに驚愕金魚":mov $4052,"八頭司夏樹"
+mov $4003,"image\post\tcg_093.jpg":mov %4063,21:mov $4043,"れれれの…さん":mov $4053,"鼻"
+mov $4004,"image\post\tcg_094.jpg":mov %4064,21:mov $4044,"さっちん":mov $4054,"氷山あずき"
+mov $4005,"image\post\tcg_095.jpg":mov %4065,21:mov $4045,"あるくぇいど":mov $4055,"不破犬"
+mov $4006,"image\post\tcg_096.jpg":mov %4066,21:mov $4046,"境界線":mov $4056,"風吹ダイチ＆乃怒亞女"
+mov $4007,"image\post\tcg_097.jpg":mov %4067,21:mov $4047,"月光賛歌":mov $4057,"北羽かけす"
+mov $4008,"image\post\tcg_098.jpg":mov %4068,21:mov $4048,"五月病":mov $4058,"鳴きうさぎ"
+mov $4009,"image\post\tcg_099.jpg":mov %4069,21:mov $4049,"夏服（偽）":mov $4059,"野島麻香"
+
+;12ページ
+notif %4020==12 skip 13
+mov $4000,"image\gallery\post\post12.jpg"
+mov $4010,"image\gallery\post\post12btn.jpg"
+mov $4001,"image\post\tcg_100.jpg":mov %4061,23:mov $4041,"哀愁アルク":mov $4051,"流裏"
+mov $4002,"image\post\tcg_101.jpg":mov %4062,23:mov $4042,"進め無敵の不死身退魔士_！その名はシエル_！_！":mov $4052,"流裏"
+mov $4003,"image\post\tcg_102.jpg":mov %4063,23:mov $4043,"ごきげん秋葉_！":mov $4053,"流裏"
+mov $4004,"image\post\tcg_103.jpg":mov %4064,23:mov $4044,"月華":mov $4054,"ＣＦ−Ｘ"
+mov $4005,"image\post\tcg_104.jpg":mov %4065,23:mov $4045,"春風の色":mov $4055,"綺羅"
+mov $4006,"image\post\tcg_105.jpg":mov %4066,23:mov $4046,"風の通り道":mov $4056,"綺羅"
+mov $4007,"*yoiyumetsuki":mov %4067,%msgno:mov $4047,"*yoiyumetsuki":mov $4057,"*yoiyumetsuki"
+mov $4008,"":mov %4068,23:mov $4048,"":mov $4058,""
+mov $4009,"":mov %4069,23:mov $4049,"":mov $4059,""
+
+;ページ番号を更新
+mov %4025,%4020
+
+;イメージ閲覧ルーチンへ移動
+gosub *imagemode_post
+
+;繰り返し
+goto *post_gallery_check
+
+return
+
+;-------------------------------------------------------------------------------
+;	メイン制御ブロック
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
+;	スクリプトブロック終了
+;-------------------------------------------------------------------------------

@@ -1,0 +1,250 @@
+;-------------------------------------------------------------------------------
+; Copyright (C) 1999-2001 TYPE-MOON All right reserved.
+;
+;       TYPE-MOON Start Script File for NScripter Ver.1.7b or upper
+;
+;   title   : 月姫 お祭りディスク フロー : op,ep,夏祭り,夢十夜など
+;	file	: 1010.txt
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
+;	スクリプトブロック開始
+;-------------------------------------------------------------------------------
+
+;-BLOCK-Twilight-(op1)----------------------------------------------------------
+*twilight_op
+gosub *s520
+if %flg8<1 goto *twilight_op_2
+select	"　１、アルクェイドへ振り向く。", *twilight_op_2,
+		"　２、ダンプカーの前へ駆け出す。", *twilight_op_3
+
+;-BLOCK-Twilight-(op2)----------------------------------------------------------
+*twilight_op_2
+!sd
+gosub *s521
+inc %twilight_aday
+goto *twilight
+
+;-BLOCK-Twilight-(op3)----------------------------------------------------------
+*twilight_op_3
+!sd
+gosub *s522
+inc %twilight_ep
+goto *twilight
+
+;-BLOCK-Twilight-(ep)-----------------------------------------------------------
+*twilight_ep
+gosub *s523
+inc %finish_ep
+inc %yume07
+goto *title
+
+
+
+;-BLOCK-おしえて！知得瑠先生！--------------------------------------------------
+*ciel_teacher
+if %flg4<1 goto *ciel_teacher_1
+if %flg5<1 goto *ciel_teacher_2
+if %flg6<1 goto *ciel_teacher_3
+if %finish_ep<1 goto *ciel_teacher_4
+goto *ciel_teacher_5
+
+;-BLOCK-おしえて！知得瑠先生！(その１)------------------------------------------
+*ciel_teacher_1
+gosub *s524
+selgosub	"１、エキスパート",*s548,
+			"２、ビギナー",*s549
+goto *twilight
+
+;-BLOCK-おしえて！知得瑠先生！(その２)------------------------------------------
+*ciel_teacher_2
+gosub *s525
+selgosub	"１、エキスパート",*s550,
+			"２、ビギナー",*s551
+goto *twilight
+
+;-BLOCK-おしえて！知得瑠先生！(その３)------------------------------------------
+*ciel_teacher_3
+gosub *s526
+selgosub	"１、エキスパート",*s552,
+			"２、ビギナー",*s553
+goto *twilight
+
+;-BLOCK-おしえて！知得瑠先生！(その４)------------------------------------------
+*ciel_teacher_4
+gosub *s527
+selgosub	"１、……あの、それでも終わらない場合は？",*s554,
+			"２、……あのあの、さらにそれでも終わらない場合は？",*s555
+goto *twilight
+
+;-BLOCK-おしえて！知得瑠先生！(その５)------------------------------------------
+*ciel_teacher_5
+gosub *s547
+selgosub	"１、どうもしない。",*nop,
+			"２、どうもする。",*s556
+goto *twilight
+
+*nop
+return
+
+;-BLOCK-夏祭り(アルクェイド)----------------------------------------------------
+*summer_ark
+gosub *s538
+inc %guest_image12
+inc %finish_summer
+;goto *title
+gosub *true_staffroll
+goto *start
+
+;-BLOCK-夏祭り(シエル)----------------------------------------------------------
+*summer_ciel
+gosub *s539
+inc %guest_image12
+inc %finish_summer
+;goto *title
+gosub *true_staffroll
+goto *start
+
+;-BLOCK-夏祭り(秋葉)------------------------------------------------------------
+*summer_akiha
+gosub *s540
+inc %guest_image12
+inc %finish_summer
+;goto *title
+gosub *true_staffroll
+goto *start
+
+;-BLOCK-夏祭り(翡翠)------------------------------------------------------------
+*summer_hisui
+gosub *s541
+inc %guest_image12
+inc %finish_summer
+;goto *title
+gosub *true_staffroll
+goto *start
+
+;-BLOCK-夏祭り(琥珀)------------------------------------------------------------
+*summer_kohaku
+gosub *s542
+inc %guest_image12
+inc %finish_summer
+;goto *title
+gosub *true_staffroll
+goto *start
+
+
+
+;-BLOCK-夢十夜(がんばれ知得瑠先生)----------------------------------------------
+*yume01
+gosub *s528
+mov $msgno,"image\word\ed_n01a.jpg"
+mov %ecgworks,0
+gosub *pre_staffroll
+inc %fin_yume01
+goto *start
+
+;-BLOCK-夢十夜(宵待閑話)--------------------------------------------------------
+*yume02
+gosub *s529
+mov $msgno,"image\word\ed_n01a.jpg"
+mov %ecgworks,1
+gosub *pre_staffroll
+inc %fin_yume02
+goto *start
+
+;-BLOCK-夢十夜(朱い月)----------------------------------------------------------
+*yume03
+gosub *s530
+mov $msgno,"image\word\ed_n01a.jpg"
+mov %ecgworks,1
+gosub *pre_staffroll
+inc %guest_image6
+inc %fin_yume03
+goto *start
+
+;-BLOCK-夢十夜(赤い鬼神)--------------------------------------------------------
+*yume04
+gosub *s531
+mov $msgno,"image\word\ed_n01a.jpg"
+mov %ecgworks,0
+gosub *pre_staffroll
+inc %fin_yume04
+goto *start
+
+;-BLOCK-夢十夜(ななこちゃんSOS!)------------------------------------------------
+*yume05
+gosub *s532
+mov $msgno,"image\word\ed_n01a.jpg"
+mov %ecgworks,1
+gosub *pre_staffroll
+inc %guest_image11
+inc %fin_yume05
+goto *start
+
+;-BLOCK-夢十夜(妹切草)----------------------------------------------------------
+*yume06
+gosub *s533
+mov $msgno,"image\word\ed_n01a.jpg"
+mov %ecgworks,0
+gosub *pre_staffroll
+inc %fin_yume06
+goto *start
+
+;-BLOCK-夢十夜(タナトスの花)----------------------------------------------------
+*yume07
+gosub *s534
+; 翡翠、琥珀を見たあとに、二人が見れる
+if %fin_tanatos_hisui>0 && %fin_tanatos_kohaku>0 jumpf
+selgosub	"１、琥珀を求める。",*s544,
+			"２、翡翠を求める。",*s545
+skip 5
+~
+selgosub	"１、琥珀を求める。",*s544,
+			"２、翡翠を求める。",*s545,
+			"３、二人を求める。",*s546
+
+mov $msgno,"image\word\ed_n01a.jpg"
+mov %ecgworks,1
+gosub *pre_staffroll
+inc %fin_yume07
+goto *start
+
+;-BLOCK-夢十夜(翡翠ちゃん、反転衝動！)------------------------------------------
+*yume08
+gosub *s535
+mov $msgno,"image\word\ed_n01b.jpg"
+mov %ecgworks,0
+gosub *pre_staffroll
+inc %fin_yume08
+goto *start
+
+;-BLOCK-夢十夜(遠野家のコン・ゲーム)--------------------------------------------
+*yume09
+gosub *s536
+mov $msgno,"image\word\ed_n01c.jpg"
+mov %ecgworks,0
+gosub *pre_staffroll
+inc %fin_yume09
+goto *start
+
+;-BLOCK-夢十夜(黎明)------------------------------------------------------------
+*yume10
+gosub *s537
+mov $msgno,"image\word\ed_n01d.jpg"
+mov %ecgworks,0
+gosub *pre_staffroll
+inc %fin_yume10
+goto *start
+
+
+;-BLOCK-酔夢月------------------------------------------------------------------
+*yoiyumetsuki
+gosub *s543
+mov $msgno,"image\word\ed_n01e.jpg"
+mov %ecgworks,0
+gosub *pre_staffroll
+goto *imagemode_post
+
+;-------------------------------------------------------------------------------
+;	スクリプトブロック終了
+;-------------------------------------------------------------------------------

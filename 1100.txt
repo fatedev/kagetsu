@@ -1,0 +1,1797 @@
+;-------------------------------------------------------------------------------
+;	スクリプトブロック終了
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+; Copyright (C) 1999-2001 TYPE-MOON All right reserved.
+;
+;       TYPE-MOON Start Script File for NScripter Ver.1.7b or upper
+;
+;   title   : 月姫 お祭りディスク フロー : サブルーチン
+;	file	: 1100.txt
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
+;	スクリプトブロック開始
+;-------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------
+;	前半用小タイトル
+*right_phase
+gosub *reset_window
+windoweffect 1
+;カーソルの表示を行わない
+gosub *nodisp_cursor
+;<右カーテン(速)>
+bg $phasebg,%type_rcartain_fst
+;<左カーテン(速)>
+ld r,$phasetitle_a,%type_lcartain_fst
+lsp 15,$phasetitle_b,320,440,0
+mov %flushcount,0
+resettimer
+waittimer 16
+msp 15,0,0,16
+inc %flushcount
+print 1
+if %flushcount<16 skip -5
+\
+csp -1
+bg #000000,%type_crossfade_fst
+gosub *set_window
+gosub *restore_weffect
+;カーソルを表示する
+gosub *disp_cursor
+return
+
+;-------------------------------------------------------------------------------
+;	後半用小タイトル
+*left_phase
+gosub *reset_window
+windoweffect 1
+;カーソルの表示を行わない
+gosub *nodisp_cursor
+;１
+;<左カーテン(速)>
+bg $phasebg,%type_lcartain_fst
+;２
+;<右カーテン(速)>
+ld l,$phasetitle_a,%type_rcartain_fst
+;３
+cmp %dispdays,$phasetitle_b,""
+if %dispdays!=0 lsp 15,$phasetitle_b,0,48,0
+;４
+mov %flushcount,0
+;５
+resettimer
+waittimer 16
+cmp %dispdays,$phasetitle_b,""
+if %dispdays!=0 msp 15,0,0,16
+inc %flushcount
+print 1
+if %flushcount<16 skip -6
+\
+csp -1
+bg #000000,%type_crossfade_fst
+gosub *set_window
+gosub *restore_weffect
+;カーソルを表示する
+gosub *disp_cursor
+return
+
+;-------------------------------------------------------------------------------
+;プレイ終了
+*endofplay
+
+;カーソルの表示を行わない
+gosub *nodisp_cursor
+
+btndef ""
+btnwait %4011
+
+; repeat again… と表示する
+br
+br
+br
+br
+br
+br
+br
+　　　　　ｒｅｐｅａｔ　ａｇａｉｎ・・・
+\
+
+playstop
+
+;カーソルを表示する
+gosub *nodisp_cursor
+
+bg #000000,%type_crossfade_slw
+
+;変数初期化
+mov %ark_point,0
+mov %ciel_point,0
+mov %akiha_point,0
+mov %akira_point,0
+mov %bunka_info_point,0
+mov %kissa_point,0
+mov %kashiisyo_point,0
+mov %eigakan_point,0
+mov %onemu_point,0
+mov %syashin_point,0
+mov %answer_point,0
+
+;フラグを保存する
+savegame 21
+
+goto *loaded
+
+;-------------------------------------------------------------------------------
+;エフェクト設定(通常速度)
+*normal_effectspeed
+mov %type_waitdisp,waitdisp
+mov %type_nowaitdisp,nowaitdisp
+mov %type_lshutter_fst,lshutter_fst
+mov %type_lshutter_mid,lshutter_mid
+mov %type_lshutter_slw,lshutter_slw
+mov %type_rshutter_fst,rshutter_fst
+mov %type_rshutter_mid,rshutter_mid
+mov %type_rshutter_slw,rshutter_slw
+mov %type_tshutter_fst,tshutter_fst
+mov %type_tshutter_mid,tshutter_mid
+mov %type_tshutter_slw,tshutter_slw
+mov %type_bshutter_fst,bshutter_fst
+mov %type_bshutter_mid,bshutter_mid
+mov %type_bshutter_slw,bshutter_slw
+mov %type_lcartain_fst,lcartain_fst
+mov %type_lcartain_mid,lcartain_mid
+mov %type_lcartain_slw,lcartain_slw
+mov %type_rcartain_fst,rcartain_fst
+mov %type_rcartain_mid,rcartain_mid
+mov %type_rcartain_slw,rcartain_slw
+mov %type_tcartain_fst,tcartain_fst
+mov %type_tcartain_mid,tcartain_mid
+mov %type_tcartain_slw,tcartain_slw
+mov %type_bcartain_fst,bcartain_fst
+mov %type_bcartain_mid,bcartain_mid
+mov %type_bcartain_slw,bcartain_slw
+mov %type_crossfade_fst,crossfade_fst
+mov %type_crossfade_mid,crossfade_mid
+mov %type_crossfade_slw,crossfade_slw
+mov %type_lscroll_fst,lscroll_fst
+mov %type_lscroll_mid,lscroll_mid
+mov %type_lscroll_slw,lscroll_slw
+mov %type_rscroll_fst,rscroll_fst
+mov %type_rscroll_mid,rscroll_mid
+mov %type_rscroll_slw,rscroll_slw
+mov %type_tscroll_fst,tscroll_fst
+mov %type_tscroll_mid,tscroll_mid
+mov %type_tscroll_slw,tscroll_slw
+mov %type_bscroll_fst,bscroll_fst
+mov %type_bscroll_mid,bscroll_mid
+mov %type_bscroll_slw,bscroll_slw
+mov %type_bscroll_slowest,bscroll_slowest
+mov %type_crossfade_fastest,crossfade_fastest
+windoweffect 10,300
+return
+
+;-------------------------------------------------------------------------------
+;エフェクト設定(高速度)
+*velocity_effectspeed
+mov %type_waitdisp,waitdisp
+mov %type_nowaitdisp,nowaitdisp
+mov %type_lshutter_fst,nowaitdisp
+mov %type_lshutter_mid,nowaitdisp
+mov %type_lshutter_slw,nowaitdisp
+mov %type_rshutter_fst,nowaitdisp
+mov %type_rshutter_mid,nowaitdisp
+mov %type_rshutter_slw,nowaitdisp
+mov %type_tshutter_fst,nowaitdisp
+mov %type_tshutter_mid,nowaitdisp
+mov %type_tshutter_slw,nowaitdisp
+mov %type_bshutter_fst,nowaitdisp
+mov %type_bshutter_mid,nowaitdisp
+mov %type_bshutter_slw,nowaitdisp
+mov %type_lcartain_fst,nowaitdisp
+mov %type_lcartain_mid,nowaitdisp
+mov %type_lcartain_slw,nowaitdisp
+mov %type_rcartain_fst,nowaitdisp
+mov %type_rcartain_mid,nowaitdisp
+mov %type_rcartain_slw,nowaitdisp
+mov %type_tcartain_fst,nowaitdisp
+mov %type_tcartain_mid,nowaitdisp
+mov %type_tcartain_slw,nowaitdisp
+mov %type_bcartain_fst,nowaitdisp
+mov %type_bcartain_mid,nowaitdisp
+mov %type_bcartain_slw,nowaitdisp
+mov %type_crossfade_fst,nowaitdisp
+mov %type_crossfade_mid,nowaitdisp
+mov %type_crossfade_slw,nowaitdisp
+mov %type_lscroll_fst,nowaitdisp
+mov %type_lscroll_mid,nowaitdisp
+mov %type_lscroll_slw,nowaitdisp
+mov %type_rscroll_fst,nowaitdisp
+mov %type_rscroll_mid,nowaitdisp
+mov %type_rscroll_slw,nowaitdisp
+mov %type_tscroll_fst,nowaitdisp
+mov %type_tscroll_mid,nowaitdisp
+mov %type_tscroll_slw,nowaitdisp
+mov %type_bscroll_fst,nowaitdisp
+mov %type_bscroll_mid,nowaitdisp
+mov %type_bscroll_slw,nowaitdisp
+mov %type_bscroll_slowest,nowaitdisp
+mov %type_crossfade_fastest,nowaitdisp
+windoweffect 1
+return
+
+;-------------------------------------------------------------------------------
+;ウィンドウエフェクトを元に戻す
+*restore_weffect
+if %effectskip==1 windoweffect 1
+if %effectskip==0 windoweffect 10,300
+return
+
+;-------------------------------------------------------------------------------
+;ウィンドウ設定をテキスト用にする
+*set_window
+;文字の左上座標X, Y, 桁数, 行数, 文字サイズX, Y, 文字間隔X, Y, デフォルト表示速度, 太字フラグ, 影付きフラグ
+;ウィンドウ色味 or 画像ファイル名, ウィンドウ左上X, Y, ウィンドウ右下X, Y
+setwindow 44,18, 24,16, 25,26, -2,4, 22, 1, 1,#808080, 0,0, 639,479
+return
+
+;ウィンドウ設定を画像用(文字が出ても暗くならない)にする
+*reset_window
+setwindow 44,18, 24,16, 25,26, -2,4, 22, 1, 1,#ffffff, 0,0, 639,479
+return
+
+;-------------------------------------------------------------------------------
+;カーソルを表示する
+*disp_cursor
+setcursor 0,":l/3,160,2;icon\cursor0.bmp",0,0
+setcursor 1,":l/3,160,2;icon\cursor1.bmp",0,0
+return
+
+;カーソルを表示しない
+*nodisp_cursor
+setcursor 0,":c;icon\hollow.bmp",0,0
+setcursor 1,":c;icon\hollow.bmp",0,0
+return
+
+;-------------------------------------------------------------------------------
+;	一括イメージ処理
+;-------------------------------------------------------------------------------
+;イメージ閲覧開始
+*imagemode
+
+;画像名を設定しているか？
+cmp %4031,$4001,""
+cmp %4032,$4002,""
+cmp %4033,$4003,""
+cmp %4034,$4004,""
+cmp %4035,$4005,""
+cmp %4036,$4006,""
+cmp %4037,$4007,""
+cmp %4038,$4008,""
+cmp %4039,$4009,""
+
+;まだ表示していない画像のところは、「Not Registed」の表示を行う。
+notif %4031==0 && fchk $4001 lsp 0,":c;image\gallery\notreg.jpg",60,15
+notif %4032==0 && fchk $4002 lsp 1,":c;image\gallery\notreg.jpg",240,15
+notif %4033==0 && fchk $4003 lsp 2,":c;image\gallery\notreg.jpg",420,15
+notif %4034==0 && fchk $4004 lsp 3,":c;image\gallery\notreg.jpg",60,150
+notif %4035==0 && fchk $4005 lsp 4,":c;image\gallery\notreg.jpg",240,150
+notif %4036==0 && fchk $4006 lsp 5,":c;image\gallery\notreg.jpg",420,150
+notif %4037==0 && fchk $4007 lsp 6,":c;image\gallery\notreg.jpg",60,285
+notif %4038==0 && fchk $4008 lsp 7,":c;image\gallery\notreg.jpg",240,285
+notif %4039==0 && fchk $4009 lsp 8,":c;image\gallery\notreg.jpg",420,285
+;if %4031==0 lsp 0,":c;image\gallery\notreg.jpg",60,15
+;if %4032==0 lsp 1,":c;image\gallery\notreg.jpg",240,15
+;if %4033==0 lsp 2,":c;image\gallery\notreg.jpg",420,15
+;if %4034==0 lsp 3,":c;image\gallery\notreg.jpg",60,150
+;if %4035==0 lsp 4,":c;image\gallery\notreg.jpg",240,150
+;if %4036==0 lsp 5,":c;image\gallery\notreg.jpg",420,150
+;if %4037==0 lsp 6,":c;image\gallery\notreg.jpg",60,285
+;if %4038==0 lsp 7,":c;image\gallery\notreg.jpg",240,285
+;if %4039==0 lsp 8,":c;image\gallery\notreg.jpg",420,285
+
+;閲覧イメージの一覧を表示する
+bg $4000,%type_crossfade_fst
+
+;ボタン定義
+btndef $4010
+if %4031!=0 && fchk $4001 btn 4001,60,15,160,120,0,0
+if %4032!=0 && fchk $4002 btn 4002,240,15,160,120,160,0
+if %4033!=0 && fchk $4003 btn 4003,420,15,160,120,320,0
+if %4034!=0 && fchk $4004 btn 4004,60,150,160,120,0,120
+if %4035!=0 && fchk $4005 btn 4005,240,150,160,120,160,120
+if %4036!=0 && fchk $4006 btn 4006,420,150,160,120,320,120
+if %4037!=0 && fchk $4007 btn 4007,60,285,160,120,0,240
+if %4038!=0 && fchk $4008 btn 4008,240,285,160,120,160,240
+if %4039!=0 && fchk $4009 btn 4009,420,285,160,120,320,240
+;if %4031!=0  btn 4001,60,15,160,120,0,0
+;if %4032!=0  btn 4002,240,15,160,120,160,0
+;if %4033!=0  btn 4003,420,15,160,120,320,0
+;if %4034!=0  btn 4004,60,150,160,120,0,120
+;if %4035!=0  btn 4005,240,150,160,120,160,120
+;if %4036!=0  btn 4006,420,150,160,120,320,120
+;if %4037!=0  btn 4007,60,285,160,120,0,240
+;if %4038!=0  btn 4008,240,285,160,120,160,240
+;if %4039!=0  btn 4009,420,285,160,120,320,240
+
+btn 1,524,412,44,48,8,368
+btn 2,568,412,44,48,52,368
+btn 3,32,424,44,28,112,368
+
+;ボタン選択待ち
+btnwait %4011
+
+if %4011==-1 csp -1:mov %4012,0:return
+
+;次のページ/前のページ
+if %4011==1 csp -1:mov %4012,-1:return
+if %4011==2 csp -1:mov %4012,1:return
+if %4011==3 csp -1:mov %4012,0:return
+
+;イメージ上をクリックしなかったら、再度表示
+if %4011<=0 skip -11
+
+;「Not Registed」の表示は消去する。
+csp -1
+
+;選択された画像を表示する
+bg $%4011,%type_crossfade_fst
+
+;クリック待ち
+btndef ""
+btnwait %4011
+
+;もう一度選ぶ
+goto *imagemode
+
+;-------------------------------------------------------------------------------
+;	一括イメージ処理(ゲスト)
+;-------------------------------------------------------------------------------
+;イメージ閲覧開始
+*imagemode_guest
+
+;画像名を設定しているか？
+cmp %4031,$4001,""
+cmp %4032,$4002,""
+cmp %4033,$4003,""
+cmp %4034,$4004,""
+cmp %4035,$4005,""
+cmp %4036,$4006,""
+cmp %4037,$4007,""
+cmp %4038,$4008,""
+cmp %4039,$4009,""
+
+;まだ表示していない画像のところは、「Not Registed」の表示を行う。
+notif %4031==0 && %4041!=0 lsp 0,":c;image\gallery\notreg.jpg",60,15
+notif %4032==0 && %4042!=0 lsp 1,":c;image\gallery\notreg.jpg",240,15
+notif %4033==0 && %4043!=0 lsp 2,":c;image\gallery\notreg.jpg",420,15
+notif %4034==0 && %4044!=0 lsp 3,":c;image\gallery\notreg.jpg",60,150
+notif %4035==0 && %4045!=0 lsp 4,":c;image\gallery\notreg.jpg",240,150
+notif %4036==0 && %4046!=0 lsp 5,":c;image\gallery\notreg.jpg",420,150
+notif %4037==0 && %4047!=0 lsp 6,":c;image\gallery\notreg.jpg",60,285
+notif %4038==0 && %4048!=0 lsp 7,":c;image\gallery\notreg.jpg",240,285
+notif %4039==0 && %4049!=0 lsp 8,":c;image\gallery\notreg.jpg",420,285
+
+;閲覧イメージの一覧を表示する
+bg $4000,%type_crossfade_fst
+
+;ボタン定義
+btndef $4010
+if %4031!=0 && %4041!=0 btn 4001,60,15,160,120,0,0
+if %4032!=0 && %4042!=0 btn 4002,240,15,160,120,160,0
+if %4033!=0 && %4043!=0 btn 4003,420,15,160,120,320,0
+if %4034!=0 && %4044!=0 btn 4004,60,150,160,120,0,120
+if %4035!=0 && %4045!=0 btn 4005,240,150,160,120,160,120
+if %4036!=0 && %4046!=0 btn 4006,420,150,160,120,320,120
+if %4037!=0 && %4047!=0 btn 4007,60,285,160,120,0,240
+if %4038!=0 && %4048!=0 btn 4008,240,285,160,120,160,240
+if %4039!=0 && %4049!=0 btn 4009,420,285,160,120,320,240
+
+btn 1,524,412,44,48,8,368
+btn 2,568,412,44,48,52,368
+btn 3,32,424,44,28,112,368
+
+;ボタン選択待ち
+btnwait %4011
+
+if %4011==-1 csp -1:mov %4012,0:return
+
+;次のページ/前のページ
+if %4011==1 csp -1:mov %4012,-1:return
+if %4011==2 csp -1:mov %4012,1:return
+if %4011==3 csp -1:mov %4012,0:return
+
+;イメージ上をクリックしなかったら、再度表示
+if %4011<=0 skip -11
+
+;「Not Registed」の表示は消去する。
+csp -1
+
+;カーソルを表示しない・暗くしない
+gosub *reset_window
+setcursor 0,":l/3,160,2;icon\hollow.bmp",0,0
+setcursor 1,":l/3,160,2;icon\hollow.bmp",0,0
+
+;選択された画像を表示する
+bg $%4011,%type_crossfade_fst
+add %4011,40
+mov $4013,$%4011
+add %4011,10
+mov $4014,$%4011
+
+;クリック待ち
+\
+
+;暗くする
+gosub *set_window
+
+;説明の文章を表示する
+br
+br
+br
+br
+br
+br
+br
+br
+br
+br
+br
+br
+■$4013■
+　$4014
+
+;クリック待ち
+\
+
+;カーソルを表示する
+setcursor 0,":l/3,160,2;icon\cursor0.bmp",0,0
+setcursor 1,":l/3,160,2;icon\cursor1.bmp",0,0
+
+;もう一度選ぶ
+goto *imagemode_guest
+
+;-------------------------------------------------------------------------------
+;	一括イメージ処理(投稿画像)
+;-------------------------------------------------------------------------------
+;イメージ閲覧開始
+*imagemode_post
+
+;画像名を設定しているか？
+cmp %4031,$4001,""
+cmp %4032,$4002,""
+cmp %4033,$4003,""
+cmp %4034,$4004,""
+cmp %4035,$4005,""
+cmp %4036,$4006,""
+cmp %4037,$4007,""
+cmp %4038,$4008,""
+cmp %4039,$4009,""
+
+;表示可能ではないところは、「Not Registed」の表示を行う。
+notif %4031==0 && %execution_cnt>=%4061 lsp 0,":c;image\gallery\notreg.jpg",40,15
+notif %4032==0 && %execution_cnt>=%4062 lsp 1,":c;image\gallery\notreg.jpg",240,15
+notif %4033==0 && %execution_cnt>=%4063 lsp 2,":c;image\gallery\notreg.jpg",440,15
+notif %4034==0 && %execution_cnt>=%4064 lsp 3,":c;image\gallery\notreg.jpg",40,150
+notif %4035==0 && %execution_cnt>=%4065 lsp 4,":c;image\gallery\notreg.jpg",240,150
+notif %4036==0 && %execution_cnt>=%4066 lsp 5,":c;image\gallery\notreg.jpg",440,150
+notif %4037==0 && %execution_cnt>=%4067 lsp 6,":c;image\gallery\notreg.jpg",40,285
+notif %4038==0 && %execution_cnt>=%4068 lsp 7,":c;image\gallery\notreg.jpg",240,285
+notif %4039==0 && %execution_cnt>=%4069 lsp 8,":c;image\gallery\notreg.jpg",440,285
+
+;閲覧イメージの一覧を表示する
+bg $4000,%type_crossfade_fst
+
+;ボタン定義
+btndef $4010
+if %4031!=0 && %execution_cnt>=%4061 btn 4001,40,15,160,120,0,0
+if %4032!=0 && %execution_cnt>=%4062 btn 4002,240,15,160,120,160,0
+if %4033!=0 && %execution_cnt>=%4063 btn 4003,440,15,160,120,320,0
+if %4034!=0 && %execution_cnt>=%4064 btn 4004,40,150,160,120,0,120
+if %4035!=0 && %execution_cnt>=%4065 btn 4005,240,150,160,120,160,120
+if %4036!=0 && %execution_cnt>=%4066 btn 4006,440,150,160,120,320,120
+if %4037!=0 && %execution_cnt>=%4067 btn 4007,40,285,160,120,0,240
+if %4038!=0 && %execution_cnt>=%4068 btn 4008,240,285,160,120,160,240
+if %4039!=0 && %execution_cnt>=%4069 btn 4009,440,285,160,120,320,240
+
+btn 1,524,412,44,48,8,368
+btn 2,568,412,44,48,52,368
+btn 3,32,424,44,28,112,368
+
+;ボタン選択待ち
+btnwait %4011
+
+if %4011==-1 csp -1:mov %4012,0:return
+
+;イメージ上をクリックしなかったら、再度表示
+if %4011<=0 skip -6
+csp -1
+
+;次のページ/前のページ
+if %4011==1 mov %4012,-1:return
+if %4011==2 mov %4012,1:return
+if %4011==3 mov %4012,0:return
+
+;酔夢月へ
+cmp %4031,$%4011,"*yoiyumetsuki"
+if %4031==0 goto $%4011
+
+;カーソルを表示しない・暗くしない
+gosub *reset_window
+setcursor 0,":l/3,160,2;icon\hollow.bmp",0,0
+setcursor 1,":l/3,160,2;icon\hollow.bmp",0,0
+
+;選択された画像を表示する
+bg $%4011,%type_crossfade_fst
+add %4011,40
+mov $4013,$%4011
+add %4011,10
+mov $4014,$%4011
+
+;クリック待ち
+\
+
+;暗くする
+gosub *set_window
+
+;説明の文章を表示する
+br
+br
+br
+br
+br
+br
+br
+br
+br
+br
+br
+br
+■$4013■
+　$4014
+
+;クリック待ち
+\
+
+;カーソルを表示する
+setcursor 0,":l/3,160,2;icon\cursor0.bmp",0,0
+setcursor 1,":l/3,160,2;icon\cursor1.bmp",0,0
+
+;もう一度選ぶ
+goto *imagemode_post
+
+;-------------------------------------------------------------------------------
+;一言選択
+*select_message
+
+;ランダムに背景を選ぶ
+rnd %tmp,6
+if %tmp==0 mov $msgbg,"image\msg\ran_bg01.jpg"
+if %tmp==1 mov $msgbg,"image\msg\ran_bg02.jpg"
+if %tmp==2 mov $msgbg,"image\msg\ran_bg03.jpg"
+if %tmp==3 mov $msgbg,"image\msg\ran_bg04.jpg"
+if %tmp==4 mov $msgbg,"image\msg\ran_bg05.jpg"
+if %tmp==5 mov $msgbg,"image\msg\ran_bg06.jpg"
+
+;ランダムに前景を選ぶ
+rnd %tmp,100
+;レアキャラクターの出現確率は3%
+if %tmp<3 skip 12
+;ノーマルキャラクター
+rnd %tmp,7
+if %tmp==0 mov $msgfg,":a;image\msg\ran_t01.jpg"
+if %tmp==1 mov $msgfg,":a;image\msg\ran_t02.jpg"
+if %tmp==2 mov $msgfg,":a;image\msg\ran_t03.jpg"
+if %tmp==3 mov $msgfg,":a;image\msg\ran_t04.jpg"
+if %tmp==4 mov $msgfg,":a;image\msg\ran_t05.jpg"
+if %tmp==5 mov $msgfg,":a;image\msg\ran_t06.jpg"
+if %tmp==6 mov $msgfg,":a;image\msg\ran_t07.jpg"
+skip 6
+
+;レアキャラクター
+rnd %tmp,2
+if %tmp==0 mov $msgfg,":a;image\msg\ran_t08.jpg"
+if %tmp==1 mov $msgfg,":a;image\msg\ran_t09.jpg"
+
+;日付でメッセージ
+date %year,%month,%day
+if %month==1 && %day==1   mov $msgline0,"あけましておめでとうございます！_！":return
+if %month==12 && %day==25 mov $msgline0,"メリークリスマス、アーンドマイバースデー！":mov $msgline1,"みんな、プレゼントちょーだーいねー_！":mov $msgfg,":a;image\msg\ran_t01.jpg":mov $msgbg,"image\msg\ran_bg07.jpg":return
+if %month==5 && %day==3   mov $msgline0,"おや、もうわたしの誕生日なんですか？":mov $msgline1,"けどわたしの年齢は永遠の謎なんですよ。":mov $msgline2,"なんてったって原作者もよく把握してませんからね〜_。":mov $msgfg,":a;image\msg\ran_t02.jpg":mov $msgbg,"image\msg\ran_bg07.jpg":return
+if %month==9 && %day==22  mov $msgline0,"今日は私の誕生日なんですね。":mov $msgline1,"一年なんてあっという間です。":mov $msgline2,"それでは皆さん、また来年、この日にお会いいたしましょう―――――":mov $msgfg,":a;image\msg\ran_t03.jpg":mov $msgbg,"image\msg\ran_bg07.jpg":return
+if %month==3 && %day==12  mov $msgline0,"今日わたしたちの誕生日だそうです。今までも、そしてこれからもよろしくお願いいたします。":mov $msgline1,"まー、槙久さまが便宜上決めたものですけどねー。":mov $msgline2,"　":mov $msgline3,"……姉さん、一言多い……_。":mov $msgfg,":a;image\msg\ran_t10.jpg":mov $msgbg,"image\msg\ran_bg07.jpg":return
+if %month==11 && %day==28 mov $msgline0,"むはぁーーーーー_！":mov $msgline1,"きのこ爆誕_！":mov $msgfg,":a;image\msg\ran_t09.jpg":mov $msgbg,"image\msg\ran_bg07.jpg":return
+if %month==8 && %day==15  mov $msgline0,"え、わたしのバースデーもちゃんとあるの！？":mov $msgline1,"うわあ、やったあ！":mov $msgline2,"これであとはヒロインに加わるだけだよね遠野くん_！":mov $msgfg,":a;image\msg\ran_t06.jpg":mov $msgbg,"image\msg\ran_bg07.jpg":return
+if %month==9 && %day==9   mov $msgline0,"………………（今日はわたしの生まれた日です）":mov $msgfg,":a;image\msg\ran_t07.jpg":mov $msgbg,"image\msg\ran_bg07.jpg":return
+;if %month== && %day== mov $msgline0,"":return
+
+;ランダムにメッセージ(３回前までに表示したメッセージは表示しない)
+rnd %msgno,208
+;inc %msgno ; 水原さん指摘の部分を修正(Ver.1.2)
+if %msgno==%lastmsgno0 skip -2
+if %msgno==%lastmsgno1 skip -3
+if %msgno==%lastmsgno2 skip -4
+mov %lastmsgno2,%lastmsgno1
+mov %lastmsgno1,%lastmsgno0
+mov %lastmsgno0,%msgno
+
+if %msgno!=0 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………それなり_！"
+return
+~
+
+if %msgno!=1 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………ぼちぼち_！"
+return
+~
+
+if %msgno!=2 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………はたまた_！"
+return
+~
+
+if %msgno!=3 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………いわんや_！"
+return
+~
+
+if %msgno!=4 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………さっぱり_！"
+return
+~
+
+if %msgno!=5 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………がっかり_！"
+return
+~
+
+if %msgno!=6 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………ばっちり_！"
+return
+~
+
+if %msgno!=7 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………やっぱり_！"
+return
+~
+
+if %msgno!=8 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………びっちり_！"
+return
+~
+
+if %msgno!=9 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………ぐったり_！"
+return
+~
+
+if %msgno!=10 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………まったり_！"
+return
+~
+
+if %msgno!=11 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………にんまり_！"
+return
+~
+
+if %msgno!=12 jumpf
+mov $msgline0,"今日の運勢："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………かつかつ_！"
+return
+~
+
+if %msgno!=13 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………………同人誌"
+return
+~
+
+if %msgno!=14 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………わりとなんでも"
+return
+~
+
+if %msgno!=15 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………………箒"
+return
+~
+
+if %msgno!=16 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………カレーパン"
+return
+~
+
+if %msgno!=17 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………カレーライス"
+return
+~
+
+if %msgno!=18 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………………心"
+return
+~
+
+if %msgno!=19 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………………黒猫"
+return
+~
+
+if %msgno!=20 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………飛び出しナイフのおもちゃ"
+return
+~
+
+if %msgno!=21 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………白いリボン"
+return
+~
+
+if %msgno!=22 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………………めがね"
+return
+~
+
+if %msgno!=23 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………カンコーヒー"
+return
+~
+
+if %msgno!=24 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………旅行かばん"
+return
+~
+
+if %msgno!=25 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………黒いリボン"
+return
+~
+
+if %msgno!=26 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………黒ニーソックス"
+return
+~
+
+if %msgno!=27 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………白いハイネック"
+return
+~
+
+if %msgno!=28 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………ナイチチ"
+return
+~
+
+if %msgno!=29 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………………蜘蛛"
+return
+~
+
+if %msgno!=30 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………にんじん"
+return
+~
+
+if %msgno!=31 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………天真爛漫"
+return
+~
+
+if %msgno!=32 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………………犬"
+return
+~
+
+if %msgno!=33 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………………鹿"
+return
+~
+
+if %msgno!=34 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………………ヒョウ"
+return
+~
+
+if %msgno!=35 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………ライオン"
+return
+~
+
+if %msgno!=36 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………カチューシャ"
+return
+~
+
+if %msgno!=37 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………おりがみ"
+return
+~
+
+if %msgno!=38 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………うめサンド"
+return
+~
+
+if %msgno!=39 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………メイド服"
+return
+~
+
+if %msgno!=40 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………………割烹着"
+return
+~
+
+if %msgno!=41 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………カレーコロッケ"
+return
+~
+
+if %msgno!=42 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………カレー饅頭"
+return
+~
+
+if %msgno!=43 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………カレーうどん"
+return
+~
+
+if %msgno!=44 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………カレーラーメン"
+return
+~
+
+if %msgno!=45 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………カレージュース"
+return
+~
+
+if %msgno!=46 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………………混沌"
+return
+~
+
+if %msgno!=47 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………………蛇"
+return
+~
+
+if %msgno!=48 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"…………………………………………いちご"
+return
+~
+
+if %msgno!=49 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………刈り上げ"
+return
+~
+
+if %msgno!=50 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………きのこ着"
+return
+~
+
+if %msgno!=51 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"……………………………………………手紙"
+return
+~
+
+if %msgno!=52 jumpf
+mov $msgline0,"今日のラッキーアイテム："
+mov $msgline1,"…………………………………………………"
+mov $msgline2,"…………………………………………………"
+mov $msgline3,"………………………………………………月"
+return
+~
+
+if %msgno!=53 jumpf
+mov $msgline0,"シナリオ担当の自画像の「化けきのこ」"
+mov $msgline2,"これはある古いアニメのキャラを、シナリ"
+mov $msgline3,"オ担当が記憶だけで描いたものが転じて自"
+mov $msgline4,"画像になったものです。…元ネタ分かるで"
+mov $msgline5,"しょうか_？"
+return
+~
+
+if %msgno!=54 jumpf
+mov $msgline0,"サークル名は「ＴＹＰＥ−ＭＯＯＮ_」以外"
+mov $msgline1,"に「斬撃皇帝騎士団_」という候補もありま"
+mov $msgline2,"した。"
+mov $msgline5,"…そっちにしなくて、良かったね_。"
+return
+~
+
+if %msgno!=55 jumpf
+mov $msgline0,"月姫本編発売からお祭り発売まででシナリ"
+mov $msgline1,"オ担当の部屋に増えた物。"
+mov $msgline3,"　扇風機一台。"
+mov $msgline5,"　あまりの快適さにシナリオ担当感涙。"
+mov $msgline6,"「すごい発明ッスよ！　シズ○ドライブな"
+mov $msgline7,"んてメジャナイッス！」"
+mov $msgline8,"　だって。よかったね_。"
+return
+~
+
+if %msgno!=56 jumpf
+mov $msgline0,"原画担当が夢を語る。"
+mov $msgline2,"「漫画喫茶で一日遊び倒したい_」"
+return
+~
+
+if %msgno!=57 jumpf
+mov $msgline0,"ＨＰ担当が、原画担当を語る。"
+mov $msgline2,"「あの人にとって、この世の萌えの８割はイシコロです_」"
+return
+~
+if %msgno!=58 jumpf
+mov $msgline0,"ＴＹＰＥ−ＭＯＯＮ打ち上げ恒例の焼肉。"
+mov $msgline1,"一番イケメンなサウンド担当が、一番肉食います_。"
+return
+~
+
+if %msgno!=59 jumpf
+mov $msgline0,"ＴＹＰＥ−ＭＯＯＮ行き付けのステーキハウス。"
+mov $msgline1,"一番良い肉食って、ＨＰ担当が腹を壊しました。"
+mov $msgline4,"「ええい、おまえにはもう食わせん！_」"
+return
+~
+
+if %msgno==60 mov $msgline0,"まぁおちつけ_。":return
+
+if %msgno!=61 jumpf
+mov $msgline0,"原画担当の住まいの隣の住人。"
+mov $msgline1,"昼夜を構わず、大熱唱_。"
+return
+~
+
+if %msgno!=62 jumpf
+mov $msgline0,"システム担当の好きなもの。"
+mov $msgline1,"「肉_」"
+return
+~
+
+if %msgno!=63 jumpf
+mov $msgline0,"シナリオ担当のあだ名。"
+mov $msgline1,"「うそつき星人_」"
+return
+~
+
+if %msgno!=64 jumpf
+mov $msgline0,"シナリオ担当の好物。"
+mov $msgline1,"「チーズ_」"
+return
+~
+
+if %msgno!=65 jumpf
+mov $msgline0,"システム担当の名言。"
+mov $msgline1,"「脳細胞が死滅する_」"
+return
+~
+
+if %msgno!=66 jumpf
+mov $msgline0,"システム担当の座右の銘。"
+mov $msgline1,"「楽をするための苦労は惜しむな_」"
+return
+~
+
+if %msgno!=67 jumpf
+mov $msgline0,"シナリオ担当座右の銘。"
+mov $msgline1,"「人類皆強大_」"
+return
+~
+
+if %msgno!=68 jumpf
+mov $msgline0,"原画担当の失敗通販。"
+mov $msgline1,"「メイド抱き枕_」"
+return
+~
+
+if %msgno!=69 jumpf
+mov $msgline0,"システム担当の、今日のお勧め小説。"
+mov $msgline1,"「星は、昴／谷甲州_」"
+return
+~
+
+if %msgno!=70 jumpf
+mov $msgline0,"システム担当の、今日のお勧め小説。"
+mov $msgline1,"「夏への扉／Ｒ・Ａ・ハインライン_」"
+return
+~
+
+if %msgno!=71 jumpf
+mov $msgline0,"システム担当の、今日のお勧め小説。"
+mov $msgline1,"「死ぬことと見つけたり／隆慶一郎_」"
+return
+~
+
+if %msgno!=72 jumpf
+mov $msgline0,"システム担当の、今日のお勧め小説。"
+mov $msgline1,"「太陽からの風／Ａ・Ｃ・クラーク_」"
+return
+~
+
+if %msgno==73 mov $msgline0,"よんでみた？":mov $msgline1,"　　　　　　　　　　ｂｙシステム担当":return
+
+if %msgno!=74 jumpf
+mov $msgline0,"システム担当の、今日のお勧め小説。"
+mov $msgline1,"「鋼鉄都市／Ａ・アシモフ_」"
+return
+~
+
+if %msgno!=75 jumpf
+mov $msgline0,"システム担当の、今日のお勧め小説。"
+mov $msgline1,"「宇宙への序曲／Ａ・Ｃ・クラーク_」"
+return
+~
+
+if %msgno!=76 jumpf
+mov $msgline0,"システム担当の、今日のお勧め小説。"
+mov $msgline1,"「キャッチワールド／Ｃ・ボイス_」"
+return
+~
+
+if %msgno!=77 jumpf
+mov $msgline0,"［レアイベントの見方］"
+mov $msgline1,"朝にアルクにもシエルにも会わずに昼食時に茶道室に行くと、レア・イベント発生_！"
+return
+~
+
+if %msgno!=78 skip 4
+mov $msgline0,"［レアイベントの見方］"
+mov $msgline1,"屋敷で翡翠と食事を作った後、文化祭で廊下を歩いていると……_？"
+return
+
+if %msgno!=79 jumpf
+mov $msgline0,"用語辞典では小学生、本編では中学生と記述の異なる、有間都古ちゃん。"
+mov $msgline1,"正しいのは小学生です。"
+mov $msgline2,"必殺技は地獄タックル_！"
+return
+~
+
+if %msgno!=80 jumpf
+mov $msgline0,"アルクェイドの綴りはＡｒｃｕｅｉｄ。"
+mov $msgline1,"ドラキュラの逆さ読みとちょっと似ているのは、偶然なんですよ〜_。"
+return
+~
+
+if %msgno!=81 jumpf
+mov $msgline0,"キャラクターパーソナルデータ１"
+mov $msgline1,"アルクェイド"
+mov $msgline2,"Ａｒｃｕｅｉｄ＝Ｂｒｕｎｅｓｔｕｄ"
+mov $msgline3,"　誕生日：１２月２５日（自称）"
+mov $msgline4,"　血液型：不明"
+mov $msgline5,"　身長・体重：１６７　５２　"
+mov $msgline6,"　スリーサイズ：Ｂ８８　Ｗ５５　Ｈ８５"
+mov $msgfg,":a;image\msg\ran_t01.jpg"
+return
+~
+
+if %msgno!=82 jumpf
+mov $msgline0,"キャラクターパーソナルデータ２"
+mov $msgline1,"シエル"
+mov $msgline2,"Ｃｉｅｌ"
+mov $msgline3,"　誕生日：５月３日"
+mov $msgline4,"　血液型：Ｏ"
+mov $msgline5,"　身長・体重：１６５　５２"
+mov $msgline6,"　スリーサイズ：Ｂ８５　Ｗ５６　Ｈ８８"
+mov $msgfg,":a;image\msg\ran_t02.jpg"
+return
+~
+
+if %msgno!=83 jumpf
+mov $msgline0,"キャラクターパーソナルデータ３"
+mov $msgline1,"秋葉"
+mov $msgline2,"Ａｋｉｈａ　Ｔｏｈｎｏ"
+mov $msgline3,"　誕生日：９月２２日"
+mov $msgline4,"　血液型：Ａ"
+mov $msgline5,"　身長・体重：１６０　４５"
+mov $msgline6,"　スリーサイズ：Ｂ７３　Ｗ５７　Ｈ７９"
+mov $msgfg,":a;image\msg\ran_t03.jpg"
+return
+~
+
+if %msgno!=84 jumpf
+mov $msgline0,"キャラクターパーソナルデータ４"
+mov $msgline1,"翡翠"
+mov $msgline2,"Ｈｉｓｕｉ"
+mov $msgline3,"　誕生日：３月１２日"
+mov $msgline4,"　血液型：Ｂ"
+mov $msgline5,"　身長・体重：１５６　４３"
+mov $msgline6,"　スリーサイズ：Ｂ７６　Ｗ５８　Ｈ８２"
+mov $msgfg,":a;image\msg\ran_t04.jpg"
+return
+~
+
+if %msgno!=85 jumpf
+mov $msgline0,"キャラクターパーソナルデータ５"
+mov $msgline1,"琥珀"
+mov $msgline2,"Ｋｏｈａｋｕ"
+mov $msgline3,"　誕生日：３月１２日"
+mov $msgline4,"　血液型：Ｂ"
+mov $msgline5,"　身長・体重：１５６　４３"
+mov $msgline6,"　スリーサイズ：Ｂ７８　Ｗ５８　Ｈ８０"
+mov $msgfg,":a;image\msg\ran_t05.jpg"
+return
+~
+
+if %msgno!=86 jumpf
+mov $msgline0,"キャラクターパーソナルデータ６"
+mov $msgline1,"弓塚さつき"
+mov $msgline2,"Ｓａｔｓｕｋｉ　Ｙｕｍｉｄｕｋａ"
+mov $msgline3,"　誕生日：８月１５日"
+mov $msgfg,":a;image\msg\ran_t06.jpg"
+return
+~
+
+if %msgno!=87 jumpf
+mov $msgline0,"キャラクターパーソナルデータ７"
+mov $msgline1,"レン"
+mov $msgline2,"Ｌｅｎ"
+mov $msgline3,"　誕生日：９月９日"
+mov $msgfg,":a;image\msg\ran_t07.jpg"
+return
+~
+
+if %msgno!=88 jumpf
+mov $msgline0,"キャラクターパーソナルデータ番外"
+mov $msgline1,"ロア"
+mov $msgline2,"Ｍｉｃｈａｅｌ＝Ｒｏａ＝"
+mov $msgline3,"　　　　　　　　　Ｖａｌｄａｍｊｏｎｇ"
+mov $msgline4,"　"
+mov $msgline5,"ネロ"
+mov $msgline6,"Ｎｅｒｏ＝Ｃｈａｏｓ"
+return
+~
+
+if %msgno!=89 jumpf
+mov $msgline0,"ちょびつ"
+return
+~
+
+if %msgno!=90 jumpf
+mov $msgline0,"ちょっと松でちゅ_！"
+return
+~
+
+if %msgno!=91 jumpf
+mov $msgline0,"ダックスフンド改造計画"
+mov $msgline1,"　　　　　〜弾丸よりも速く〜"
+return
+~
+
+if %msgno!=92 skip 3
+mov $msgline0,"ミート君十七分割"
+return
+
+if %msgno!=93 jumpf
+mov $msgline0,"うー、まんぼ！やっやっや_！"
+return
+~
+
+if %msgno!=94 jumpf
+mov $msgline0,"「なんてロマンチックなんだ_」"
+mov $msgline1,""
+return
+~
+
+if %msgno==95  mov $msgline0,"きのこちんぴんち":return
+if %msgno==96  mov $msgline0,"……らぶ":return
+if %msgno==97  mov $msgline0,"らららららー":return
+if %msgno==99  mov $msgline0,"「コクリコと結婚しますー_」":return
+if %msgno==101 mov $msgline0,"「デブではない……っ_！_」":return
+if %msgno==102 mov $msgline0,"ネコ！ネコ！ネコ_！":return
+if %msgno==103 mov $msgline0,"いえーい、絶不調":return
+if %msgno==104 mov $msgline0,"さっきの嘘ですー":return
+if %msgno==105 mov $msgline0,"ふふふ、ふにゃー_！":return
+if %msgno==106 mov $msgline0,"あ、ところできのこ、探偵学園に入学します。":mov $msgline1,"せーのっ、うＱ〜……":return
+if %msgno==107 mov $msgline0,"とりあえず修行してきます_。":return
+if %msgno==109 mov $msgline0,"追い込みの原画担当宅。":mov $msgline1,"倒れた男が一人。":mov $msgline2,"　「ねぇ、絵、あがった？」":mov $msgline3,"返事がない、ただの屍のようだ_。":return
+if %msgno==110 mov $msgline0,"愛とか道徳とか、@カモノハシとか素敵だよね_。":return
+if %msgno==111 mov $msgline0,"かき鳴らせオレのギター！ぎゃいーん_。":return
+if %msgno==112 mov $msgline0,"けやー_。":return
+if %msgno==113 mov $msgline0,"えい、ぺち。五億ダメージ_。":return
+if %msgno==115 mov $msgline0,"マイカイザンパイバイバイダーリン_！":return
+if %msgno==116 mov $msgline0,"ケーキマシンガン食い":return
+if %msgno==117 mov $msgline0,"花言葉はくりきんとん":return
+if %msgno==118 mov $msgline0,"うそ！？わたし忍者になれますわ！":mov $msgline1,"やめとけって_。":return
+if %msgno==120 mov $msgline0,"新手の敵スタ○ドか！？":mov $msgline1,"気がついたら財布の中身が全部子供銀行になってたぜ_！":return
+if %msgno==121 mov $msgline0,"鮫二刀流。かなり強め_。":return
+if %msgno==122 mov $msgline0,"なんか気持ちいいっちー_！":return
+if %msgno==123 mov $msgline0,"没なものは没":return
+if %msgno==124 mov $msgline0,"ラーメン食うアルか_？":return
+if %msgno==125 mov $msgline0,"寝言シリーズ。":mov $msgline1,"「おまえの秘密を知っている_」":return
+if %msgno==126 mov $msgline0,"寝言シリーズ。":mov $msgline1,"「しかし活動は始まっていた_」":return
+if %msgno==127 mov $msgline0,"寝言シリーズ。":mov $msgline1,"「エコエコアザラク…_」":return
+if %msgno==128 mov $msgline0,"寝言シリーズ。":mov $msgline1,"「お前では俺には勝てん_」":return
+if %msgno==129 mov $msgline0,"寝言シリーズ。":mov $msgline1,"「デットエンドあいのうた！_」":return
+if %msgno==130 mov $msgline0,"寝言シリーズ。":mov $msgline1,"「……もう食べるコトしか楽しみないッスよ……_」":return
+if %msgno==132 mov $msgline0,"「月姫２ 〜妹姫〜_」では妹が１２人に！":mov $msgline1,"お兄ちゃんが手をつないであげるＹＯ！":mov $msgline2,"乞御期待_。":mov $msgline3,"":return
+if %msgno==133 mov $msgline0,"「月姫２_」では遠野屋敷が女子寮に！":mov $msgline1,"ラブあり、ひなあり、温泉ありの大騒ぎ！":mov $msgline2,"乞御期待な_。":mov $msgline3,"":return
+if %msgno==134 mov $msgline0,"月姫２があるとしたら主役なのでは、と囁かれるエンハウンス。":mov $msgline1,"そのルックスはデビルメイク○イの主人公そのものだとか。あーあ_。":mov $msgline2,"":mov $msgline3,"":return
+if %msgno==135 mov $msgline0,"うそつき星人の異名を持つシナリオ担当。":mov $msgline1,"「シエルが初めて戦った死徒は、インドの死徒カリー・ド・マルシェ」と言っておきながら、つい先日「そんな死徒いねぇよ」と言い出す始末。":mov $msgline2,"　もう何がなんだか分からねぇ…":mov $msgline3,"":return
+if %msgno==136 mov $msgline0,"シナリオ担当はじめて購入したＨゲーム。":mov $msgline1,"「○ヨナ・ぴコナ_」":return
+if %msgno==137 mov $msgline0,"ＨＰ担当、さく○３をやる。":mov $msgline1,"　数日後、シナリオ担当に謎のメールが送られる。":mov $msgline2,"「オレ、コクリコと結婚しますー_」":mov $msgline3,"":return
+if %msgno==138 mov $msgline0,"希望の多かった、さつきシナリオ。":mov $msgline1,"実は出来あがっていると言う噂もあります。いつか日の目をみれるかも_？":return
+if %msgno==139 mov $msgline0,"大学時代バンドでヴォーカルの経験がある、サウンド担当。":mov $msgline1,"　いつか、彼の熱唱の主題歌が付くかも知れない…":return
+if %msgno==140 mov $msgline0,"シナリオ担当の癖。":mov $msgline1,"　人生を左右しかねないほど大事なことをジャンケンで決めたがる。":mov $msgline2,"そして負ける_。":mov $msgline3,"":return
+if %msgno==141 mov $msgline0,"今回もＢ４６さんには、大量の誤字脱字をチェックして頂きました。":mov $msgline1,"　本当にありがとうございます（スタッフ一同）":return
+if %msgno==142 mov $msgline0,"某恋愛ちゅの主題歌を気に入った原画担当。":mov $msgline1,"「アレと似たような、脳が蕩けるような曲をＣＤにしてくれ」とＨＰ担当に依頼。":mov $msgline2,"　それ以来、原画担当の所に電話すると決まって「さくら３_」の主題歌が流れているという怪現象が_。":mov $msgline3,"":return
+if %msgno==143 mov $msgline0,"有彦、今日はマキで行くゼ。":mov $msgline1,"　マキとは真剣勝負の意。他にはヒラ（今日はイカサマ技なし）というのもあり。":mov $msgline2,"　シナリオ担当はこれを共通語と思い込んでいる節がある_。":mov $msgline3,"":return
+if %msgno==144 mov $msgline0,"歌月十夜、シナリオ担当お勧めシーン。":mov $msgline1,"「アカ関係_」":return
+if %msgno==145 mov $msgline0,"歌月十夜、原画担当お気に入りキャラ。":mov $msgline1,"「月姫蒼香_」":return
+if %msgno==146 mov $msgline0,"月姫読本を作る際、原画担当は二年間分の引出しが空っぽになったと語る。":mov $msgline1,"　一方、シナリオ担当は月姫作成のために十年間ためこんだマンガ・ＣＤ等を全て売却。":mov $msgline2,"自らを形成していたオタク倉庫が空っぽになったと嘆く_。":return
+if %msgno==147 mov $msgline0,"「げっちゃ_」で話題に上がった、各ヒロインのテーマソング。":mov $msgline1,"翡翠のテーマソングだけは、原画担当の趣味で決定されたという。":mov $msgline2,"イメージ違う〜って思われた皆様。ごめんなさい_。":return
+if %msgno==148 mov $msgline0,"月姫の設定資料集、「月姫読本」":mov $msgline1,"機能を重視して選んだ表紙は、予備校の教科書みたいと大評判。言われれば、もうそうとしか見えません_。":return
+if %msgno==149 mov $msgline0,"一番はじめに翡翠のコスプレをしてくれたのは、何を隠そう、ＴＹＰＥ−ＭＯＯＮの売り子さんですよ。":mov $msgline1,"えへん_。":return
+if %msgno==150 mov $msgline0,"月姫半月版の時、購入してくれた皆様の多くがその理由を「売り子のメイドさんに目を引かれて_」と答えてくれました。":mov $msgline1,"売り子さんが一番の功労者かもしれません（笑）":return
+if %msgno==151 mov $msgline0,"月姫、初期設定では、ゲーム期間がなんと一ヶ月間という設定でした。":mov $msgline1,"全クリまでにかかる時間が１２０時間という偉業を成し遂げられたかも…":return
+if %msgno==152 mov $msgline0,"月姫、初期設定ではネロは名前だけで、登場の予定はありませんでした。":mov $msgline1,"　ワンワンパニック_！":return
+if %msgno==153 mov $msgline0,"月姫、初期設定ではシエル先輩は可愛らしく、制作スタッフにもとても可愛がられていました。":mov $msgline1,"　ああ、どこをどう間違ったのか、最終的にはあんなに地味な娘に…（泣）":return
+if %msgno==154 mov $msgline0,"月姫、初期設定では、志貴は死の線が視えてしまうが故にわりとひねくれた性格をしていたそうな……_。":mov $msgline1,"":return
+
+if %msgno!=155 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１／プライミッツマーダー"
+mov $msgline2,"　霊長の殺人者。白い獣。魔犬としてアルトルージュにのみ従うガイアの怪物。"
+mov $msgline3,"　死徒ではないが、アルトルージュを真似ている為に人の血を飲むようになった。"
+mov $msgline4,"　ヒトに対して絶対的な殺害権利を持つが故に最強の一つとして数えられる_。"
+return
+
+if %msgno!=156 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　２／ｔｈｅ　ｄａｒｋ　ｓｉｘ"
+mov $msgline2,"　最初の死徒。最初のシステム。だが完成にはいまだ至らず_。"
+mov $msgline3,""
+mov $msgline4,""
+return
+
+if %msgno!=157 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　３／朱い月のブリュンスタッド"
+mov $msgline2,"　アルティミットワン_。"
+mov $msgline3,""
+mov $msgline4,""
+return
+
+if %msgno!=158 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　４／ゼルレッチ"
+mov $msgline2,"　魔道元帥。とんでもねえほど傍若無人かつ正義のひと。"
+mov $msgline3,"　某、空条ジョータローみたいな人で、気に食わないから朱い月のブリュンスタッドにケンカを売ったとかなんとか_。"
+mov $msgline4,""
+return
+
+if %msgno!=159 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　５／ＯＲＴ"
+mov $msgline2,"　オルト。南米の密林に棲む死徒。侵食固有異界・水晶渓谷を有する。"
+mov $msgline3,"　あえていうのなら、フォルムは蜘蛛に類似している_。"
+mov $msgline4,""
+return
+
+if %msgno!=160 skip 8
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　６／リィゾ＝バールシュトラウト"
+mov $msgline2,"　黒騎士シュトラウト。魔剣ニアダークを持つ、最古参である三人のうち一人。"
+mov $msgline3,"　時の呪いを病んでいるために不死と噂される。アルトルージュの護衛の一人。"
+mov $msgline4,"　月姫２では殺人貴のライバル（笑）。\"
+mov $msgline5,"　……いや、だから月姫２なんてありません_。"
+return
+
+if %msgno!=161 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　７／アインナッシュ"
+mov $msgline2,"　腑海林。思考林とも呼ばれる。元々は普通の死徒だった。現在のアインナッシュは二代目である_。"
+mov $msgline3,""
+mov $msgline4,""
+return
+
+if %msgno!=162 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　８／フィナ＝ヴラドスヴェルテン"
+mov $msgline2,"　白騎士。ストラトバリスの悪魔。美少年趣味で同姓からしか血を吸わない困ったちゃん。"
+mov $msgline3,"　固有結界パレードを有し、幽霊船団のキャプテンでもある。なんだそりゃ。"
+mov $msgline4,"　アルトルージュの護衛の一人_。"
+return
+
+if %msgno!=163 skip 8
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　９／アルトルージュブリュンスタッド"
+mov $msgline2,"　死徒における吸血姫。真祖と死徒の混血。"
+mov $msgline3,"　アルクェイドの姉とも言える存在。が、外見は十四歳ほどの可憐な少女。"
+mov $msgline4,"　普段はそう優れた能力は持たず、空想具現化も不可能だ。"
+mov $msgline5,"　が、魔法少女よろしく、二段変身するとかなんとか_。"
+return
+
+if %msgno!=164 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１０／ネロカオス"
+mov $msgline2,"　月姫本編参照のコトアルヨー_。"
+mov $msgline3,""
+mov $msgline4,""
+return
+
+if %msgno!=165 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１１／カルハイン"
+mov $msgline2,"　スタンローブ。別名、“街食う者”。"
+mov $msgline3,"　捕食公爵の異名を持つ。すでに教会によって討たれているがその怨念はいまだ残留し、周囲のモノ全てを破壊するだけの力の渦となっている。"
+mov $msgline4,"　まこと、迷惑極まりない_。"
+return
+
+if %msgno!=166 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１３／？？？？"
+mov $msgline2,"　存在すると言われる祖。タタリ。"
+mov $msgline3,"　自身を存在ではなく現象に祭り上げようとした祖のなれの果て_。"
+mov $msgline4,""
+return
+
+if %msgno!=167 skip 8
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１４／ヴァン＝フェム"
+mov $msgline2,"　最古参の死徒の一人。精巧さにかけるものの、巨大な物を作り上げるという面では最高の人形師。"
+mov $msgline3,"　七大ゴーレム“魔城”を誇るのだが、うち一つは白騎士ヴラドの幽霊船団によって攻落とされた。以来、ヴラドとは犬猿の仲である。"
+mov $msgline4,"　本名ヴァンデルシュターム。世界有数の巨大財閥のトップであり、闇の世界ではなく財界に君臨する魔王と言われる。"
+mov $msgline5,"　ここ数百年のマイブームはエコロジーだとか_。"
+return
+
+if %msgno!=168 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１５／リタロズィーアン"
+mov $msgline2,"　典型的なお貴族吸血鬼。"
+mov $msgline3,"　主から領地を受け継いだ二代目で、やりたい放題やっている快楽主義者。なのだが、根がひんまがっている為か満たされる事などなく、たえず退屈に支配されているお嬢様。"
+mov $msgline4,"　スミレとは仲がいい。自分かスミレ、もしどちらかが死ぬ時があるのなら、それはどちらかが殺す時だと思っているほど。……ん？君らホントに仲いいの_？"
+return
+
+if %msgno!=169 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１６／グランスルグブラックモア"
+mov $msgline2,"　鵬。黒翼公。魔術でもある固有結界、ネバーモアを操る死徒。"
+mov $msgline3,"　あまりにハタ迷惑な死徒なので教会に封印されている。"
+mov $msgline4,"　もとは人間が魔術探究の末に吸血種になったもの。今ではすでに別の正体を持ち、その姿は全長数キロという巨大なカラスであるらしい_。"
+return
+
+if %msgno!=170 skip 8
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１７／トラフィムオーテンロッゼ"
+mov $msgline2,"　白翼公。"
+mov $msgline3,"　最古参の死徒の一人。死徒に特異な能力（ネロやグランスルグ、ナハト等に代表される超抜能力）は必要なく、ただ吸血種として優れていればよい、という考えの人。"
+mov $msgline4,"　シンプルイズベストを地で行くお貴族さまだが、結果として十七という位置づけにされている。"
+mov $msgline5,"　その領地は祖の中でも最大。死徒たちにおいて、現段階での王といえばこの人物_。"
+return
+
+if %msgno!=171 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　１８／エンハウンス"
+mov $msgline2,"　復讐騎。主である十八位の祖を殺しその座についた。"
+mov $msgline3,"　まだ人間としての部分が強く、意思の強さだけでいうのならば他の祖を上回る_。"
+mov $msgline4,""
+return
+
+if %msgno!=172 skip 8
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　２０／メレムソロモン"
+mov $msgline2,"　吸血鬼殺しである筈の組織、埋葬機関の一員という変わった祖。"
+mov $msgline3,"　四大の魔獣、と呼ばれる使い魔を駆使する。"
+mov $msgline4,"　本来なら裏切り者とされる筈なのだが、なぜか他の祖はメレムを容認している。"
+mov $msgline5,"　隠れアルクェイドファンであるらしい_。"
+return
+
+if %msgno!=173 skip 9
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　２１／スミレ"
+mov $msgline2,"　水魔スミレ。水中に棲む死徒の中の変種。"
+mov $msgline3,"　死徒の中で唯一空想具現化を可能とする。"
+mov $msgline4,"　自然干渉のルールから外れた存在で、ある意味超能力者と言えるかもしれない。\"
+mov $msgline5,"　悲観主義者で自堕落な性格だが、なんでもない事を楽しめる常備酔っ払い状態の女の人。"
+mov $msgline6,"　ちなみに、月姫２では殺人貴にちょっかいだす、ただの酔っ払ったおねーさんだとか_。"
+return
+
+if %msgno!=174 skip 10
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　２７／コーバックアルカトラス"
+mov $msgline2,"　千年錠の死徒。"
+mov $msgline3,"　魔術師が研究の果てに死徒になったモノ。"
+mov $msgline4,"　誰にも侵入できない宝物庫を作り上げるも、そこから出れなくなったお茶目さん。"
+mov $msgline5,"　二十七祖ではお笑い担当と言われている。"
+mov $msgline6,"　が、その能力は――――まあお笑い担当である。"
+mov $msgline7,"　ゼルレッチとは旧知の仲。魔法使い一歩手前の大魔術師_。"
+return
+
+if %msgno!=175 skip 7
+mov $msgline0,"二十七祖シリーズ。"
+mov $msgline1,"　ｅｘ／ミハイルロアバルダムヨォン"
+mov $msgline2,"　月姫本編を参照。"
+mov $msgline3,"　彼もまた、魔法に至るために死徒となった魔術師_。"
+mov $msgline4,""
+return
+
+if %msgno!=176 skip 7
+mov $msgline0,"歌月十夜制作秘話。"
+mov $msgline1,"シナリオ担当、原画担当、ともに今回こそは駄目かと思ったと言う…"
+mov $msgline2,""
+mov $msgline3,""
+mov $msgline4,""
+return
+
+if %msgno!=177 skip 7
+mov $msgline0,"歌月十夜制作秘話。"
+mov $msgline1,"企画段階からいろいろな部分がカットされました。"
+mov $msgline2,"一番大きかったのが、さつきシナリオ。"
+mov $msgline3,"次が各キャラのＨシーン。"
+mov $msgline4,"泣く泣く削った部分もありますが、結果として綺麗にまとまっていると思います。如何でしょうか_。"
+return
+
+if %msgno!=178 skip 7
+mov $msgline0,"歌月十夜制作秘話。"
+mov $msgline1,"秋葉の後日談「宵待閑話_」では、秋葉が髪を切るかどうかで、スタッフ内意見が割れました。"
+mov $msgline2,"結果は宵待閑話を参照です_。"
+mov $msgline3,""
+mov $msgline4,""
+return
+
+if %msgno!=179 skip 3
+mov $msgline0,"気をつけて！イタ○ア人はみんなホ○_！"
+return
+
+if %msgno==180 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"絶対やりたかった、翡翠琥珀二人同時Ｈシーン。":mov $msgline2,"当初企画していたものから規模は縮小されたものの、なんとか出来あがりました。":mov $msgline3,"萌え萌えよ〜_！":return
+if %msgno==181 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"イベントＣＧは、こやまひろかず氏に塗って頂きました。匠の技をご覧あれ_。":return
+if %msgno==182 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"立ち絵は前回同様、原画担当が塗りました。堪忍したってや〜３日で１００枚だったんや〜（泣）":return
+if %msgno==183 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"今回は、月姫のファンの方々から、沢山の投稿作品を頂きました。ありがとうございます〜":return
+if %msgno==184 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"夢十夜、シナリオ担当の書いた７篇は一日一本のペースでした。日替わり月姫_！":return
+if %msgno==185 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"シナリオ担当の部屋には冷房設備がありませんでした。暑かった_！":return
+if %msgno==186 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"イメージムービー制作は［Ｔｉ］さん。ムービーもかっこいいですが、ご本人もナイスガイなのです_！":return
+if %msgno==187 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"追加の立ち絵の数は１００枚以上有るのですが、一回限りしか使われないものが多いため、あんまり増えた気がしません。":mov $msgline2,"ちくしょー_！":return
+if %msgno==188 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"月姫が夜の青。歌月十夜は黄昏の黄金がイメージカラーになっています。ジャケットも並べて良い感じになっていると思います_。":return
+if %msgno==189 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"サウンドは、新曲１０曲。サウンド担当、頑張りました_！":return
+if %msgno==190 mov $msgline0,"歌月十夜制作秘話。":mov $msgline1,"システム担当は、追い込みの時期に本業でもテンパってました。":mov $msgline2,"「なっ！　ウイルスかぁっ_？！_」":return
+if %msgno==191 mov $msgline0,"永遠メイデン":mov $msgline1,"":return
+if %msgno==192 mov $msgline0,"関係者各位に通達。":mov $msgline1,"　まぎらわしいのは分かりますが、ネロとロアを間違えるのはいいかげんやめてください_。":return
+if %msgno==193 mov $msgline0,"いいんだな！　コイツを好きにしちゃって_！":mov $msgline1,"":return
+if %msgno==194 mov $msgline0,"だが俺は電算機！　勝利へのプラン、固まった_！":mov $msgline1,"":return
+if %msgno==195 mov $msgline0,"これを言ったら負けシリーズ":mov $msgline1,"本場のチャイナドレスおねーさんはそんなモンじゃないぜ……_。":return
+if %msgno==196 mov $msgline0,"こんなの坂のうち入らへん_。":mov $msgline1,"":return
+if %msgno==197 mov $msgline0,"「僕は君を断罪する！」":mov $msgline1,"　エンハウンスの台詞と思われがちなコレ、実は人気投票の発表の際、ＨＰ担当が冗談で某アニメからそのまんま持ってきただけだったりして_。":return
+if %msgno==198 mov $msgline0,"シキ君、俺が好きなだけコーヒーを買ってあげるよ_。":mov $msgline1,"":return
+if %msgno==199 mov $msgline0,"うーんむにゃむにゃ……３５０ｇなんて食べられないよう…むにゃむにゃ_。":mov $msgline1,"":return
+if %msgno==200 mov $msgline0,"俺のかなう相手では無かった！…よいしょっと_。":mov $msgline1,"":return
+if %msgno==201 mov $msgline0,"所詮シエルだし_。":mov $msgline1,"":return
+if %msgno==202 mov $msgline0,"お酒は二十歳になってからだよ_。":mov $msgline1,"":return
+if %msgno==203 mov $msgline0,"シエルさん、今度はインドです_。":mov $msgline1,"":return
+if %msgno==204 mov $msgline0,"そろそろおねむ_？":mov $msgline1,"":return
+if %msgno==205 mov $msgline0,"毒茸流剣術。":mov $msgline1,"下半身不随剣、植物人間剣などダイレクトな技めじろおし_。":return
+if %msgno==206 mov $msgline0,"毒茸流格闘術。":mov $msgline1,"皆殺しバルカン、わくわくジェノサイド、ハイパー吐瀉物などなど、頭が悪い技めじろおし_。":return
+if %msgno==207 mov $msgline0,"「シエルちゃんはなんで死なないのん？」":mov $msgline1,"「インドですけどー_」":return
+;if %msgno==208 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==209 mov $msgline0,"":mov $msgline1,"":return
+
+;if %msgno==190 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==191 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==192 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==193 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==194 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==195 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==196 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==197 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==198 mov $msgline0,"":mov $msgline1,"":return
+;if %msgno==199 mov $msgline0,"":mov $msgline1,"":return
+
+mov $msgline0,"歌月十夜制作秘話。"
+mov $msgline1,"このランダムメッセージ。"
+mov $msgline2,"全部で２００ぐらいあります。"
+mov $msgline3,"隠しキャラクターもいますので、何度も試してくださいね。"
+mov $msgline4,"あと、特別な日には、特別なメッセージがありますよ_。"
+return
+
+
+;-------------------------------------------------------------------------------
+;仮スタッフロール
+*pre_staffroll
+
+gosub *reset_window
+
+bg "image\bg\ima_10.jpg",%type_nowaitdisp
+
+!w500
+
+;CD-DA「学校・昼」
+;play "*5"
+playstop
+mp3loop "TMCD-0103-05.mp3"
+
+
+bg $msgno,%type_lshutter_fst
+
+!w3000
+
+bg "image\word\ed_n02.jpg",%type_rshutter_fst
+
+
+!w3000
+
+bg "image\word\ed_n03.jpg",%type_tshutter_fst
+
+if %ecgworks<1 jumpf
+!w3000
+bg "image\word\ed_n04.jpg",%type_tshutter_fst
+~
+mov %ecgworks,0
+
+!w3000
+
+bg "image\word\ed_n05.jpg",%type_bshutter_fst
+
+
+!w3000
+
+bg "image\word\ed_n06.jpg",%type_lshutter_fst
+!w3000
+
+bg "image\word\ed_n07.jpg",%type_bshutter_fst
+!w5000
+
+gosub *set_window
+
+
+;CD-DA停止
+;playstop
+stop
+
+bg black,crossfade_fst
+
+return
+
+;------------------------------------------------------------------------------
+;トゥルー・スタッフロール
+*true_staffroll
+
+gosub *reset_window
+
+bg black,crossfade_slw
+
+;スクロール開始
+saveoff
+btndef "image\word\staff.jpg"
+
+mov %2100,480
+mov %2101,800
+mov %2102,1120
+mov %2103,1440
+mov %2104,1760
+mov %2105,2080
+mov %2106,2400
+mov %2107,2720
+mov %2108,3040
+mov %2109,3360
+mov %2110,3680
+mov %2111,4640
+mov %2112,5120
+mov %2113,5440
+mov %2114,5960
+mov %2115,6280
+mov %2116,6600
+
+~
+sub %2100,1
+sub %2101,1
+sub %2102,1
+sub %2103,1
+sub %2104,1
+sub %2105,1
+sub %2106,1
+sub %2107,1
+sub %2108,1
+sub %2109,1
+sub %2110,1
+sub %2111,1
+sub %2112,1
+sub %2113,1
+sub %2114,1
+sub %2115,1
+sub %2116,1
+resettimer
+if %2100<480 && %2100>-58  blt 0,%2100,640, 58,0,   0,640, 58
+if %2101<480 && %2101>-31  blt 0,%2101,640, 31,0,  58,640, 31
+if %2102<480 && %2102>-65  blt 0,%2102,640, 65,0,  89,640, 65
+if %2103<480 && %2103>-34  blt 0,%2103,640, 34,0, 154,640, 34
+if %2104<480 && %2104>-34  blt 0,%2104,640, 34,0, 188,640, 34
+if %2105<480 && %2105>-32  blt 0,%2105,640, 32,0, 222,640, 32
+if %2106<480 && %2106>-34  blt 0,%2106,640, 34,0, 254,640, 34
+if %2107<480 && %2107>-189 blt 0,%2107,640,189,0, 288,640,189
+if %2108<480 && %2108>-32  blt 0,%2108,640, 32,0, 477,640, 32
+if %2109<480 && %2109>-275 blt 0,%2109,640,275,0, 509,640,275
+if %2110<480 && %2110>-917 blt 0,%2110,640,917,0, 784,640,917
+if %2111<480 && %2111>-449 blt 0,%2111,640,449,0,1701,640,449
+if %2112<480 && %2112>-207 blt 0,%2112,640,207,0,2150,640,207
+if %2113<480 && %2113>-246 blt 0,%2113,640,246,0,2357,640,246
+if %2114<480 && %2114>-39  blt 0,%2114,640, 39,0,2603,640, 39
+if %2115<480 && %2115>-50  blt 0,%2115,640, 50,0,2642,640, 50
+if %2116<480 && %2116>-38  blt 0,%2116,640, 38,0,2692,640, 38
+waittimer 16
+;すべての画像がスクロールし終わるまで、チルダ記号との間を繰り返す
+if %2116>221 jumpb
+
+;ちょっと待つ
+resettimer
+waittimer 1000
+
+;スクロール終わり
+ofscpy
+
+;CD-DA停止
+playstop
+
+;暗くなって
+bg black,crossfade_slw
+
+;Copyrightを表示
+bg "image\word\allright.jpg",crossfade_slw
+
+;ちょっと待つ
+resettimer
+waittimer 1000
+
+;暗くなって
+bg white,crossfade_slw
+
+saveon
+
+return
+
